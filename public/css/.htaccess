@@ -1,0 +1,4 @@
+# 设置CSS文件的Content-Type
+<Files "*.css">
+    Header set Content-Type "text/css; charset=utf-8"
+</Files>
