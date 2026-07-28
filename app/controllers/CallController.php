@@ -21,7 +21,8 @@ class CallController {
         try {
             // 验证用户登录
             if (session_status() === PHP_SESSION_NONE) {
-                session_start();
+                require_once BASE_PATH . '/core/session.php';
+                ensureSessionStarted();
             }
             
             if (!isset($_SESSION['user_id'])) {
@@ -94,7 +95,8 @@ class CallController {
         try {
             // 验证用户登录
             if (session_status() === PHP_SESSION_NONE) {
-                session_start();
+                require_once BASE_PATH . '/core/session.php';
+                ensureSessionStarted();
             }
             
             if (!isset($_SESSION['user_id'])) {
@@ -137,7 +139,8 @@ class CallController {
         try {
             // 验证用户登录
             if (session_status() === PHP_SESSION_NONE) {
-                session_start();
+                require_once BASE_PATH . '/core/session.php';
+                ensureSessionStarted();
             }
             
             if (!isset($_SESSION['user_id'])) {
@@ -173,7 +176,8 @@ class CallController {
         try {
             // 验证用户登录
             if (session_status() === PHP_SESSION_NONE) {
-                session_start();
+                require_once BASE_PATH . '/core/session.php';
+                ensureSessionStarted();
             }
             
             if (!isset($_SESSION['user_id'])) {
@@ -209,7 +213,8 @@ class CallController {
         try {
             // 验证用户登录
             if (session_status() === PHP_SESSION_NONE) {
-                session_start();
+                require_once BASE_PATH . '/core/session.php';
+                ensureSessionStarted();
             }
             
             if (!isset($_SESSION['user_id'])) {

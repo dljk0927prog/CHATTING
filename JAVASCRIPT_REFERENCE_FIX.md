@@ -23,12 +23,12 @@
 从 `app/views/chat/room.php` 中删除了以下引用：
 ```html
 <!-- 删除的引用 -->
-<script src="/CHATTING/public/js/signaling-client.js"></script>
-<script src="/CHATTING/public/js/webrtc-core.js"></script>
-<script src="/CHATTING/public/js/audio-manager.js"></script>
-<script src="/CHATTING/public/js/video-manager.js"></script>
-<script src="/CHATTING/public/js/call-ui.js"></script>
-<script src="/CHATTING/public/js/call-system.js"></script>
+<script src="/Chat_System/public/js/signaling-client.js"></script>
+<script src="/Chat_System/public/js/webrtc-core.js"></script>
+<script src="/Chat_System/public/js/audio-manager.js"></script>
+<script src="/Chat_System/public/js/video-manager.js"></script>
+<script src="/Chat_System/public/js/call-ui.js"></script>
+<script src="/Chat_System/public/js/call-system.js"></script>
 ```
 
 ### 2. **修复CallSystem相关代码**
@@ -106,9 +106,9 @@ function toggleMic() {
 
 ### 3. **验证URL**
 测试以下URL是否正常工作：
-- `localhost/CHATTING/chat/test.php` - 基本PHP测试
-- `localhost/CHATTING/chat/simple_call.php?roomId=4&callType=voice` - 语音通话页面
-- `localhost/CHATTING/chat/videoCall.php?roomId=4&callType=voice` - 重定向测试
+- `localhost/Chat_System/chat/test.php` - 基本PHP测试
+- `localhost/Chat_System/chat/simple_call.php?roomId=4&callType=voice` - 语音通话页面
+- `localhost/Chat_System/chat/videoCall.php?roomId=4&callType=voice` - 重定向测试
 
 ## 📊 **修复前后对比**
 

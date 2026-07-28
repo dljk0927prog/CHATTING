@@ -12,7 +12,7 @@ $lang = Language::getInstance();
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo __('error_404_title'); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         /* 404页面移动端优化 */
         @media (max-width: 768px) {
@@ -79,9 +79,10 @@ $lang = Language::getInstance();
                     抱歉，您访问的页面不存在或已被删除。
                 </p>
                 
-                <a href="/CHATTING/chat" class="btn btn-primary">返回首页</a>
+                <a href="/Chat_System/chat" class="btn btn-primary">返回首页</a>
             </div>
         </div>
     </div>
+    <?php $footerVariant = 'default'; include BASE_PATH . '/app/views/components/site-footer.php'; ?>
 </body>
 </html>

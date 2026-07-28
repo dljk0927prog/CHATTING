@@ -1,0 +1,148 @@
+/* 消息气泡操作栏 - 默认隐藏，悬停消息时显示 */
+.message {
+    position: relative;
+}
+
+.message-content {
+    position: relative;
+    overflow: visible;
+}
+
+.message-bubble-bar {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(20, 20, 20, 0.92);
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+}
+
+.message-bubble-bar.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.message.own .message-bubble-bar {
+    left: auto;
+    right: 0;
+    transform: translateX(0);
+}
+
+.message.own .message-bubble-bar.show {
+    transform: translateX(0);
+}
+
+.bubble-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.bubble-btn:hover,
+.bubble-btn:focus-visible {
+    background: rgba(255, 255, 255, 0.18);
+    transform: scale(1.08);
+    outline: none;
+}
+
+.bubble-icon {
+    font-size: 17px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.bubble-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+    z-index: 1001;
+}
+
+.bubble-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.85);
+}
+
+.bubble-btn:hover .bubble-tooltip,
+.bubble-btn:focus-visible .bubble-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.bubble-btn.favorited {
+    color: #ffd700;
+    background: rgba(255, 215, 0, 0.15);
+}
+
+.bubble-btn.pinned {
+    color: #ff8a8a;
+    background: rgba(255, 107, 107, 0.15);
+}
+
+.message.long-press-active .message-bubble-bar {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+    .message-bubble-bar {
+        gap: 6px;
+        padding: 6px 10px;
+        max-width: calc(100vw - 24px);
+        overflow-x: auto;
+    }
+
+    .bubble-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .bubble-icon {
+        font-size: 15px;
+    }
+}

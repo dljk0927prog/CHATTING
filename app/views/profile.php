@@ -1,7 +1,7 @@
 <?php
 // 个人资料页面 - 检查用户是否已登录
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /CHATTING/auth/login");
+    header("Location: /Chat_System/auth/login");
     exit;
 }
 
@@ -17,7 +17,7 @@ $userModel = new User();
 $user = $userModel->getUserById($_SESSION['user_id']);
 
 if (!$user) {
-    header("Location: /CHATTING/auth/login");
+    header("Location: /Chat_System/auth/login");
     exit;
 }
 ?>
@@ -30,7 +30,7 @@ if (!$user) {
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo str_replace('{username}', htmlspecialchars($user['username']), __('profile_page_title')); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         .profile-container {
             max-width: 800px;
@@ -655,7 +655,7 @@ if (!$user) {
 <body>
     <div class="profile-container">
         <div class="profile-card">
-            <a href="/CHATTING/dashboard" class="back-btn" title="<?php echo __('btn_back'); ?>"></a>
+            <a href="/Chat_System/dashboard" class="back-btn" title="<?php echo __('btn_back'); ?>"></a>
             <div class="profile-header">
                 <div class="profile-avatar" onclick="showAvatarModal()">
                     <?php 
@@ -663,7 +663,7 @@ if (!$user) {
                     $avatarExists = !empty($user['avatar']) && file_exists($avatarPath);
                     ?>
                     <?php if ($avatarExists): ?>
-                        <img src="/CHATTING/public/uploads/avatars/<?php echo htmlspecialchars($user['avatar']); ?>" alt="<?php echo __('avatar_default'); ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <img src="/Chat_System/public/uploads/avatars/<?php echo htmlspecialchars($user['avatar']); ?>" alt="<?php echo __('avatar_default'); ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div style="display:none; width:100%; height:100%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); align-items:center; justify-content:center; color:white; font-size:3rem; font-weight:bold; border-radius:50%;">
                             <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
                         </div>
@@ -827,7 +827,7 @@ if (!$user) {
             const formData = new FormData();
             formData.append('avatar', selectedFile);
             
-            fetch('/CHATTING/profile/uploadAvatar', {
+            fetch('/Chat_System/profile/uploadAvatar', {
                 method: 'POST',
                 body: formData
             })
@@ -977,7 +977,7 @@ if (!$user) {
                 formData.append('value', value);
             }
 
-            fetch('/CHATTING/profile/update', {
+            fetch('/Chat_System/profile/update', {
                 method: 'POST',
                 body: formData
             })
@@ -997,5 +997,6 @@ if (!$user) {
             });
         }
     </script>
+    <?php $footerVariant = 'default'; include BASE_PATH . '/app/views/components/site-footer.php'; ?>
 </body>
 </html>

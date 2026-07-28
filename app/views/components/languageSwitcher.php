@@ -162,7 +162,7 @@ $supportedLanguages = $lang->getSupportedLanguages();
         button.disabled = true;
         
         // 发送AJAX请求切换语言
-        fetch('/CHATTING/language/switch?lang=' + language, {
+        fetch('/Chat_System/language/switch?lang=' + language, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

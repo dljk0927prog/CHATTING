@@ -23,7 +23,7 @@ $lang = Language::getInstance();
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css?v=<?php echo time(); ?>">
     <style>
         * {
             margin: 0;
@@ -1329,7 +1329,7 @@ $lang = Language::getInstance();
                     <!-- 页面头部 -->
                     <div class="settings-header">
                         <div class="header-top">
-                            <a href="/CHATTING/forum/view?id=<?php echo $forum['id']; ?>" class="back-btn">
+                            <a href="/Chat_System/forum/view?id=<?php echo $forum['id']; ?>" class="back-btn">
                                 <span>←</span>
                                 <span><?php echo __('back_to_forum', '返回论坛'); ?></span>
                             </a>
@@ -1368,7 +1368,7 @@ $lang = Language::getInstance();
                                         
                                         if (!empty($forum['avatar']) && $forum['avatar'] !== 'default_forum_avatar.png' && file_exists(dirname(__DIR__, 3) . '/public/uploads/avatars/' . $forum['avatar'])) {
                                             $timestamp = filemtime(dirname(__DIR__, 3) . '/public/uploads/avatars/' . $forum['avatar']);
-                                            echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($forum['avatar']) . '?t=' . $timestamp . '" alt="论坛头像">';
+                                            echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($forum['avatar']) . '?t=' . $timestamp . '" alt="论坛头像">';
                                             error_log("Avatar Debug - 显示头像图片: " . $forum['avatar']);
                                         } else {
                                             echo strtoupper(substr($forum['name'], 0, 1));
@@ -1442,7 +1442,7 @@ $lang = Language::getInstance();
                                                 <?php 
                                                 $memberAvatar = $member['avatar'] ?? null;
                                                 if (!empty($memberAvatar) && $memberAvatar !== 'default_avatar.png' && file_exists(dirname(__DIR__, 3) . '/public/uploads/avatars/' . $memberAvatar)) {
-                                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($memberAvatar) . '" alt="头像">';
+                                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($memberAvatar) . '" alt="头像">';
                                                 } else {
                                                     echo strtoupper(substr($member['username'], 0, 1));
                                                 }
@@ -1510,7 +1510,7 @@ $lang = Language::getInstance();
                                                 <?php 
                                                 $requestAvatar = $request['avatar'] ?? null;
                                                 if (!empty($requestAvatar) && $requestAvatar !== 'default_avatar.png' && file_exists(dirname(__DIR__, 3) . '/public/uploads/avatars/' . $requestAvatar)) {
-                                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($requestAvatar) . '" alt="头像">';
+                                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($requestAvatar) . '" alt="头像">';
                                                 } else {
                                                     echo strtoupper(substr($request['username'], 0, 1));
                                                 }
@@ -1649,7 +1649,7 @@ $lang = Language::getInstance();
                             <div class="friend-avatar">
                                 <?php 
                                 if (!empty($friend['avatar']) && $friend['avatar'] !== 'default_avatar.png' && file_exists(dirname(__DIR__, 3) . '/public/uploads/avatars/' . $friend['avatar'])) {
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($friend['avatar']) . '" alt="头像">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($friend['avatar']) . '" alt="头像">';
                                 } else {
                                     echo strtoupper(substr($friend['username'], 0, 1));
                                 }
@@ -1708,7 +1708,7 @@ $lang = Language::getInstance();
                             <div class="friend-avatar">
                                 <?php 
                                 if (!empty($member['avatar']) && $member['avatar'] !== 'default_avatar.png' && file_exists(dirname(__DIR__, 3) . '/public/uploads/avatars/' . $member['avatar'])) {
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($member['avatar']) . '" alt="头像">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($member['avatar']) . '" alt="头像">';
                                 } else {
                                     echo strtoupper(substr($member['username'], 0, 1));
                                 }
@@ -1797,7 +1797,7 @@ $lang = Language::getInstance();
             formData.append('avatar', selectedFile);
             formData.append('forum_id', forumId);
             
-            fetch('/CHATTING/forum/updateForumAvatar', {
+            fetch('/Chat_System/forum/updateForumAvatar', {
                 method: 'POST',
                 body: formData
             })
@@ -1849,7 +1849,7 @@ $lang = Language::getInstance();
                 return;
             }
             
-            fetch('/CHATTING/forum/updateSettings', {
+            fetch('/Chat_System/forum/updateSettings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -1885,7 +1885,7 @@ $lang = Language::getInstance();
                 is_public: document.getElementById('isPublic').value
             };
             
-            fetch('/CHATTING/forum/updateSettings', {
+            fetch('/Chat_System/forum/updateSettings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -1908,7 +1908,7 @@ $lang = Language::getInstance();
         
         // 处理加入请求
         function handleJoinRequest(requestId, action) {
-            fetch('/CHATTING/forum/handleJoinRequest', {
+            fetch('/Chat_System/forum/handleJoinRequest', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -1933,7 +1933,7 @@ $lang = Language::getInstance();
         // 提升为管理员
         function promoteToAdmin(userId) {
             if (confirm('<?php echo __('confirm_set_admin', '确定要将此成员设为管理员吗？'); ?>')) {
-                fetch('/CHATTING/forum/updateMemberRole', {
+                fetch('/Chat_System/forum/updateMemberRole', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1959,7 +1959,7 @@ $lang = Language::getInstance();
         // 取消管理员
         function demoteFromAdmin(userId) {
             if (confirm('<?php echo __('confirm_remove_admin', '确定要取消此成员的管理员权限吗？'); ?>')) {
-                fetch('/CHATTING/forum/updateMemberRole', {
+                fetch('/Chat_System/forum/updateMemberRole', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1985,7 +1985,7 @@ $lang = Language::getInstance();
         // 移除成员
         function removeMember(userId) {
             if (confirm('<?php echo __('confirm_remove_member', '确定要移除此成员吗？'); ?>')) {
-                fetch('/CHATTING/forum/removeMember', {
+                fetch('/Chat_System/forum/removeMember', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -2011,7 +2011,7 @@ $lang = Language::getInstance();
         // 退出论坛
         function leaveForum() {
             if (confirm('<?php echo __('confirm_leave_forum', '确定要退出此论坛吗？退出后您将无法再访问论坛内容。'); ?>')) {
-                fetch('/CHATTING/forum/leaveForum', {
+                fetch('/Chat_System/forum/leaveForum', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -2022,7 +2022,7 @@ $lang = Language::getInstance();
                 .then(data => {
                     if (data.success) {
                         alert('✅ <?php echo __('leave_forum_success', '已成功退出论坛'); ?>');
-                        window.location.href = '/CHATTING/list_forum';
+                        window.location.href = '/Chat_System/list_forum';
                     } else {
                         alert('❌ <?php echo __('leave_forum_failed', '退出失败'); ?>: ' + data.message);
                     }
@@ -2039,7 +2039,7 @@ $lang = Language::getInstance();
             const forumName = prompt('<?php echo __('enter_forum_name_to_confirm_delete', '请输入论坛名称以确认删除'); ?>:');
             if (forumName === '<?php echo $forum['name']; ?>') {
                 if (confirm('⚠️ <?php echo __('confirm_delete_forum', '确定要删除此论坛吗？'); ?>\n\n<?php echo __('delete_operations_will', '此操作将'); ?>：\n• <?php echo __('permanently_delete_all_posts', '永久删除所有帖子'); ?>\n• <?php echo __('permanently_delete_all_replies', '永久删除所有回复'); ?>\n• <?php echo __('permanently_delete_all_attachments', '永久删除所有附件文件'); ?>\n• <?php echo __('permanently_delete_all_member_info', '永久删除所有成员信息'); ?>\n• <?php echo __('permanently_delete_all_join_requests', '永久删除所有加入请求'); ?>\n• <?php echo __('permanently_delete_forum_data', '永久删除论坛数据'); ?>\n\n<?php echo __('operation_cannot_be_undone', '此操作不可撤销！'); ?>')) {
-                    fetch('/CHATTING/forum/delete', {
+                    fetch('/Chat_System/forum/delete', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -2050,7 +2050,7 @@ $lang = Language::getInstance();
                     .then(data => {
                         if (data.success) {
                             alert('✅ <?php echo __('forum_deleted', '论坛已删除'); ?>');
-                            window.location.href = '/CHATTING/list_forum';
+                            window.location.href = '/Chat_System/list_forum';
                         } else {
                             alert('❌ <?php echo __('delete_failed', '删除失败'); ?>: ' + data.message);
                         }
@@ -2210,7 +2210,7 @@ $lang = Language::getInstance();
                     inviteBtn.textContent = '<?php echo __('inviting', '邀请中...'); ?>';
                 }
                 
-                fetch('/CHATTING/forum/inviteMember', {
+                fetch('/Chat_System/forum/inviteMember', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',

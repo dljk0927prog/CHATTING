@@ -1,5 +1,7 @@
 <?php
-session_start();
+define('BASE_PATH', dirname(dirname(dirname(__DIR__))));
+require_once BASE_PATH . '/core/session.php';
+ensureSessionStarted();
 
 // 添加错误报告
 error_reporting(E_ALL);

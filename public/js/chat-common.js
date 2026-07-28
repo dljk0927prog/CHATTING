@@ -1,8 +1,183 @@
 /**
  * 聊天页面通用功能
  * 包含文件上传、语音录制、消息发送等共享功能
- * 版本: 2025-01-27 修复文件上传按钮问题
  */
+
+function chatT(key, params) {
+    let str = (window.chatI18n && window.chatI18n[key]) || key;
+    if (params) {
+        Object.keys(params).forEach(function(k) {
+            str = str.split('{' + k + '}').join(params[k]);
+        });
+    }
+    return str;
+}
+
+function getMessageSignature(message) {
+    return JSON.stringify({
+        content: message.content || '',
+        is_recalled: message.is_recalled ? 1 : 0,
+        is_pinned: message.is_pinned ? 1 : 0,
+        file_path: message.file_path || '',
+        message_type: message.message_type || 'text'
+    });
+}
+
+function keepBubbleVisible(bubbleElement) {
+    if (bubbleElement) bubbleElement.classList.add('show');
+}
+
+function hideBubbleOnLeave(bubbleElement) {
+    setTimeout(function() {
+        if (bubbleElement && !bubbleElement.matches(':hover')) {
+            bubbleElement.classList.remove('show');
+        }
+    }, 300);
+}
+
+function buildBubbleButton(action, icon, label, extraClass) {
+    extraClass = extraClass || '';
+    const safeLabel = String(label).replace(/"/g, '&quot;');
+    return `<button type="button" class="bubble-btn${extraClass}" onclick="${action}" aria-label="${safeLabel}">
+        <span class="bubble-icon" aria-hidden="true">${icon}</span>
+        <span class="bubble-tooltip">${safeLabel}</span>
+    </button>`;
+}
+
+function attachMessageBubbleBar(messageElement, messageData, currentUserId) {
+    const contentDiv = messageElement.querySelector('.message-content');
+    if (!contentDiv || !messageData || !messageData.id) return;
+
+    const existing = contentDiv.querySelector('.message-bubble-bar');
+    if (existing) existing.remove();
+
+    const isOwnMessage = Number(messageData.sender_id) === Number(currentUserId);
+    const createdAt = new Date(messageData.created_at).getTime();
+    const messageAge = isNaN(createdAt) ? 9999 : (Date.now() - createdAt) / 1000;
+    const canRecall = isOwnMessage && messageAge <= 120;
+    const isTextOnly = messageData.message_type === 'text' && !messageData.file_path;
+    const isPinned = !!(messageData.is_pinned == 1 || messageData.is_pinned === true);
+    const escContent = String(messageData.content || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+    const bubbleBar = document.createElement('div');
+    bubbleBar.className = 'message-bubble-bar';
+    bubbleBar.id = 'bubble-' + messageData.id;
+
+    let html = '';
+
+    if (isOwnMessage) {
+        const recallAction = messageData.message_type === 'text' && canRecall ? 'recallMessage' : 'deleteMessage';
+        const recallLabel = messageData.message_type === 'text' && canRecall ? chatT('message_recall') : chatT('message_delete');
+        const recallIcon = messageData.message_type === 'text' && canRecall ? '↩️' : '🗑️';
+        html += buildBubbleButton(`${recallAction}(${messageData.id})`, recallIcon, recallLabel);
+        if (isTextOnly) {
+            html += buildBubbleButton(`editMessage(${messageData.id}, '${escContent}')`, '✏️', chatT('message_edit'));
+        }
+    }
+
+    const pinLabel = isPinned ? chatT('message_unpin') : chatT('message_pin');
+    html += buildBubbleButton(`toggleFavorite(${messageData.id})`, '⭐', chatT('message_favorite_short'));
+    html += buildBubbleButton(`togglePin(${messageData.id})`, '📌', pinLabel, isPinned ? ' pinned' : '');
+    html += buildBubbleButton(`quoteMessage(${messageData.id})`, '💬', chatT('quote_label'));
+    html += buildBubbleButton(`forwardMessage(${messageData.id})`, '📤', chatT('message_share'));
+
+    bubbleBar.innerHTML = html;
+    bubbleBar.addEventListener('mouseenter', function() { keepBubbleVisible(this); });
+    bubbleBar.addEventListener('mouseleave', function() { hideBubbleOnLeave(this); });
+    contentDiv.appendChild(bubbleBar);
+}
+
+function stampExistingMessageSignatures(roomId) {
+    if (!roomId) return;
+    fetch('/Chat_System/chat/getRoomMessages?room_id=' + roomId)
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (!data.success || !Array.isArray(data.messages)) return;
+            const sigMap = {};
+            data.messages.forEach(function(message) {
+                sigMap[String(message.id)] = getMessageSignature(message);
+            });
+            document.querySelectorAll('#messages-container .message[data-message-id]').forEach(function(el) {
+                const id = el.getAttribute('data-message-id');
+                if (id && sigMap[id] && !el.getAttribute('data-msg-sig')) {
+                    el.setAttribute('data-msg-sig', sigMap[id]);
+                }
+            });
+        })
+        .catch(function(err) { console.error('stampExistingMessageSignatures failed:', err); });
+}
+
+function syncRoomMessages(roomId, createMessageElementFn, options) {
+    options = options || {};
+    const container = document.getElementById('messages-container');
+    if (!container || typeof createMessageElementFn !== 'function') return;
+
+    const scrollTop = container.scrollTop;
+    const scrollHeight = container.scrollHeight;
+    const isAtBottom = scrollTop + container.clientHeight >= scrollHeight - 10;
+
+    const existingMap = new Map();
+    container.querySelectorAll('[data-message-id]').forEach(function(el) {
+        existingMap.set(el.getAttribute('data-message-id'), el);
+    });
+
+    fetch('/Chat_System/chat/getRoomMessages?room_id=' + roomId)
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (!data.success || !Array.isArray(data.messages)) return;
+
+            let changed = false;
+            data.messages.forEach(function(message) {
+                const id = String(message.id);
+                const signature = getMessageSignature(message);
+                const existing = existingMap.get(id);
+
+                if (existing) {
+                    const prevSig = existing.getAttribute('data-msg-sig');
+                    if (!prevSig) {
+                        existing.setAttribute('data-msg-sig', signature);
+                        return;
+                    }
+                    if (prevSig !== signature) {
+                        const newEl = createMessageElementFn(message);
+                        if (newEl) {
+                            newEl.setAttribute('data-msg-sig', signature);
+                        if (typeof addMessageEventListeners === 'function') {
+                            addMessageEventListeners(newEl);
+                        }
+                        existing.replaceWith(newEl);
+                            changed = true;
+                        }
+                    }
+                } else {
+                    const newEl = createMessageElementFn(message);
+                    if (newEl) {
+                        newEl.setAttribute('data-msg-sig', signature);
+                        if (typeof addMessageEventListeners === 'function') {
+                            addMessageEventListeners(newEl);
+                        }
+                        container.appendChild(newEl);
+                        changed = true;
+                    }
+                }
+            });
+
+            if (changed) {
+                enhanceMediaElements(container);
+                if (typeof window.addQuoteClickHandlers === 'function') {
+                    window.addQuoteClickHandlers();
+                }
+                if (isAtBottom || options.forceScroll) {
+                    setTimeout(function() {
+                        if (typeof scrollToBottom === 'function') scrollToBottom();
+                    }, 100);
+                }
+            }
+        })
+        .catch(function(error) {
+            console.error('syncRoomMessages failed:', error);
+        });
+}
 
 // 文件上传相关变量
 let selectedFiles = [];
@@ -79,7 +254,7 @@ function handleFileSelect(input) {
     
     // 检查文件数量限制
     if (selectedFiles.length + files.length > maxFiles) {
-        alert(`最多只能选择${maxFiles}个文件`);
+        alert(chatT('max_files_alert', { max: maxFiles }));
         return;
     }
     
@@ -111,8 +286,8 @@ function showFilePreview() {
     const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
     const totalSizeMB = (totalSize / 1024 / 1024).toFixed(2);
     previewInfo.innerHTML = `
-        <div class="file-count">已选择 ${selectedFiles.length} 个文件</div>
-        <div class="file-size">总大小: ${totalSizeMB} MB</div>
+        <div class="file-count">${chatT('files_selected', { count: selectedFiles.length })}</div>
+        <div class="file-size">${chatT('total_size_mb', { size: totalSizeMB })}</div>
     `;
     
     // 显示文件预览网格
@@ -130,7 +305,7 @@ function showFilePreview() {
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                contentDiv.innerHTML = `<img src="${e.target.result}" alt="预览图片" class="preview-thumbnail">`;
+                contentDiv.innerHTML = `<img src="${e.target.result}" alt="${chatT('preview_image_alt')}" class="preview-thumbnail">`;
             };
             reader.readAsDataURL(file);
         } else if (file.type.startsWith('video/')) {
@@ -163,9 +338,16 @@ function showFilePreview() {
 
 function removeFilePreview() {
     selectedFiles = [];
-    document.getElementById('filePreviewArea').classList.add('hidden');
-    document.getElementById('fileInput').value = '';
+    const previewArea = document.getElementById('filePreviewArea');
+    const previewContent = document.getElementById('previewContent');
+    const previewInfo = document.getElementById('previewInfo');
+    if (previewContent) previewContent.innerHTML = '';
+    if (previewInfo) previewInfo.innerHTML = '';
+    if (previewArea) previewArea.classList.add('hidden');
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) fileInput.value = '';
 }
+window.removeFilePreview = removeFilePreview;
 
 function removeFile(index) {
     selectedFiles.splice(index, 1);
@@ -298,7 +480,7 @@ function sendTextMessage(content, roomId) {
         body += `&quoted_message_id=${quotedMessageId}`;
     }
     
-    fetch('/CHATTING/chat/sendMessage', {
+    fetch('/Chat_System/chat/sendMessage', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -322,7 +504,7 @@ function sendTextMessage(content, roomId) {
     })
     .then(data => {
         if (data.success) {
-            // 发送成功后清空输入框并刷新消息区域
+            // 发送成功后清空输入框
             document.getElementById('message-input').value = '';
             
             // 清除引用状态
@@ -330,18 +512,26 @@ function sendTextMessage(content, roomId) {
                 clearQuote();
             }
             
+            // 优先使用服务器返回的消息立即追加到列表（与群组一致）
+            if (data.message && typeof addNewMessageToChat === 'function') {
+                addNewMessageToChat(data.message);
+                if (typeof scrollToBottom === 'function') setTimeout(scrollToBottom, 100);
+            }
             if (typeof refreshMessagesArea === 'function') {
-                refreshMessagesArea();
+                refreshMessagesArea(true);
             } else if (typeof refreshMessages === 'function') {
                 refreshMessages();
             }
+            if (typeof refreshSidebar === 'function') {
+                refreshSidebar();
+            }
         } else {
-            showNotification('发送失败: ' + data.message, 'error');
+            showNotification(chatT('send_failed') + ': ' + data.message, 'error');
         }
     })
     .catch(error => {
         console.error('发送消息失败:', error);
-        showNotification('发送失败: ' + error.message, 'error');
+        showNotification(chatT('send_failed') + ': ' + error.message, 'error');
     });
 }
 
@@ -357,7 +547,7 @@ function sendFileWithMessage(content, roomId) {
     formData.append('file_type', currentFileType);
     formData.append('file_count', selectedFiles.length);
     
-    fetch('/CHATTING/chat/sendMultipleFiles', {
+    fetch('/Chat_System/chat/sendMultipleFiles', {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -380,22 +570,28 @@ function sendFileWithMessage(content, roomId) {
     })
     .then(data => {
         if (data.success) {
-            showNotification('文件发送成功', 'success');
-            // 清空文件选择并刷新消息区域
+            showNotification(chatT('file_send_success'), 'success');
             removeFilePreview();
             document.getElementById('message-input').value = '';
+            if (data.message && typeof addNewMessageToChat === 'function') {
+                addNewMessageToChat(data.message);
+                if (typeof scrollToBottom === 'function') setTimeout(scrollToBottom, 100);
+            }
             if (typeof refreshMessagesArea === 'function') {
-                refreshMessagesArea();
+                refreshMessagesArea(true);
             } else if (typeof refreshMessages === 'function') {
                 refreshMessages();
             }
+            if (typeof refreshSidebar === 'function') {
+                refreshSidebar();
+            }
         } else {
-            showNotification('文件发送失败: ' + data.message, 'error');
+            showNotification(chatT('file_send_failed') + ': ' + data.message, 'error');
         }
     })
     .catch(error => {
         console.error('文件发送失败:', error);
-        showNotification('文件发送失败: ' + error.message, 'error');
+        showNotification(chatT('file_send_failed') + ': ' + error.message, 'error');
     });
 }
 
@@ -408,7 +604,7 @@ function sendVoiceMessage(audioBlob, roomId) {
     formData.append('room_id', roomId);
     
     // 发送语音消息
-    fetch('/CHATTING/chat/sendVoiceMessage', {
+    fetch('/Chat_System/chat/sendVoiceMessage', {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -431,22 +627,28 @@ function sendVoiceMessage(audioBlob, roomId) {
     })
     .then(data => {
         if (data.success) {
-            showNotification('语音消息发送成功', 'success');
-            // 移除预览并刷新消息区域
+            showNotification(chatT('voice_send_success'), 'success');
             removeVoicePreview();
             document.getElementById('message-input').value = '';
+            if (data.message && typeof addNewMessageToChat === 'function') {
+                addNewMessageToChat(data.message);
+                if (typeof scrollToBottom === 'function') setTimeout(scrollToBottom, 100);
+            }
             if (typeof refreshMessagesArea === 'function') {
-                refreshMessagesArea();
+                refreshMessagesArea(true);
             } else if (typeof refreshMessages === 'function') {
                 refreshMessages();
             }
+            if (typeof refreshSidebar === 'function') {
+                refreshSidebar();
+            }
         } else {
-            showNotification('语音消息发送失败: ' + data.message, 'error');
+            showNotification(chatT('voice_send_failed') + ': ' + data.message, 'error');
         }
     })
     .catch(error => {
         console.error('语音消息发送失败:', error);
-        showNotification('语音消息发送失败: ' + error.message, 'error');
+        showNotification(chatT('voice_send_failed') + ': ' + error.message, 'error');
     });
 }
 
@@ -506,10 +708,187 @@ function scrollToBottom() {
     }
 }
 
+const MEDIA_VIDEO_EXTENSIONS = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv'];
+
+function getMediaExtension(url) {
+    if (!url) return '';
+    try {
+        const path = new URL(url, window.location.origin).pathname;
+        return path.split('.').pop().toLowerCase();
+    } catch (e) {
+        return url.split('.').pop().split('?')[0].toLowerCase();
+    }
+}
+
+function isVideoMediaUrl(url) {
+    return MEDIA_VIDEO_EXTENSIONS.includes(getMediaExtension(url));
+}
+
+window.showMediaPreview = function(url, isVideo) {
+    const modal = document.getElementById('imagePreviewModal');
+    if (!modal || !url) return;
+
+    const previewImage = document.getElementById('previewImage');
+    const previewVideo = document.getElementById('previewVideo');
+    const thumbnails = document.getElementById('previewThumbnails');
+    if (thumbnails) thumbnails.innerHTML = '';
+
+    if (isVideo) {
+        if (previewImage) previewImage.style.display = 'none';
+        if (previewVideo) {
+            previewVideo.style.display = 'block';
+            previewVideo.src = url;
+            previewVideo.load();
+        }
+    } else {
+        if (previewVideo) {
+            previewVideo.pause();
+            previewVideo.removeAttribute('src');
+            previewVideo.style.display = 'none';
+        }
+        if (previewImage) {
+            previewImage.style.display = 'block';
+            previewImage.src = url;
+        }
+    }
+
+    modal.classList.remove('hidden');
+};
+
+window.showMediaGallery = function(items, startIndex) {
+    if (!items || !items.length) return;
+    startIndex = Math.max(0, Math.min(startIndex || 0, items.length - 1));
+
+    const thumbnails = document.getElementById('previewThumbnails');
+    if (thumbnails) {
+        thumbnails.innerHTML = '';
+        items.forEach(function(item, index) {
+            const thumb = document.createElement('div');
+            thumb.className = 'thumbnail-item' + (index === startIndex ? ' active' : '');
+            thumb.onclick = function() {
+                window.showMediaGallery(items, index);
+            };
+            if (item.isVideo) {
+                thumb.innerHTML = '<video class="thumbnail-media" muted><source src="' + item.url + '"></video><div class="thumbnail-play-icon">▶</div>';
+            } else {
+                thumb.innerHTML = '<img src="' + item.url + '" alt="" class="thumbnail-media">';
+            }
+            thumbnails.appendChild(thumb);
+        });
+    }
+
+    const current = items[startIndex];
+    window.showMediaPreview(current.url, current.isVideo);
+};
+
+window.hideImagePreview = function() {
+    const modal = document.getElementById('imagePreviewModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    const previewVideo = document.getElementById('previewVideo');
+    if (previewVideo) {
+        previewVideo.pause();
+        previewVideo.removeAttribute('src');
+    }
+};
+
+function openCollagePreview(collageEl, startUrl) {
+    const items = [];
+    collageEl.querySelectorAll('img.collage-thumbnail, video.collage-thumbnail').forEach(function(el) {
+        let url = '';
+        if (el.tagName === 'IMG') {
+            url = el.src;
+        } else {
+            const source = el.querySelector('source');
+            url = source ? source.src : el.currentSrc;
+        }
+        if (url) {
+            items.push({ url: url, isVideo: isVideoMediaUrl(url) });
+        }
+    });
+    const idx = items.findIndex(function(i) { return i.url === startUrl; });
+    window.showMediaGallery(items, idx >= 0 ? idx : 0);
+}
+
+function enhanceMediaElements(root) {
+    if (!root) return;
+    root.querySelectorAll('.message-video:not([data-preview-enhanced])').forEach(function(video) {
+        video.setAttribute('data-preview-enhanced', '1');
+        const source = video.querySelector('source');
+        const url = source ? source.src : video.currentSrc;
+        if (!url) return;
+
+        const wrap = document.createElement('div');
+        wrap.className = 'media-preview-wrap';
+        video.parentNode.insertBefore(wrap, video);
+        wrap.appendChild(video);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'media-expand-btn';
+        btn.dataset.url = url;
+        btn.dataset.type = 'video';
+        btn.innerHTML = '⛶';
+        btn.title = typeof chatT === 'function' ? chatT('image_preview_title') : '预览';
+        wrap.appendChild(btn);
+    });
+}
+
+function initMediaPreviewClicks() {
+    if (window._mediaPreviewInitialized) return;
+    window._mediaPreviewInitialized = true;
+
+    document.addEventListener('click', function(e) {
+        const expandBtn = e.target.closest('.media-expand-btn');
+        if (expandBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.showMediaPreview(expandBtn.dataset.url, expandBtn.dataset.type === 'video');
+            return;
+        }
+
+        const img = e.target.closest('img.message-image, img.collage-thumbnail');
+        if (img) {
+            e.preventDefault();
+            const collage = img.closest('.image-collage');
+            if (collage) {
+                openCollagePreview(collage, img.src);
+            } else {
+                window.showMediaPreview(img.src, false);
+            }
+            return;
+        }
+
+        const collageVideo = e.target.closest('video.collage-thumbnail');
+        if (collageVideo) {
+            e.preventDefault();
+            const collage = collageVideo.closest('.image-collage');
+            const source = collageVideo.querySelector('source');
+            const url = source ? source.src : collageVideo.currentSrc;
+            if (collage && url) {
+                openCollagePreview(collage, url);
+            } else if (url) {
+                window.showMediaPreview(url, true);
+            }
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('imagePreviewModal');
+        if (!modal || modal.classList.contains('hidden')) return;
+        if (e.target === modal) window.hideImagePreview();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') window.hideImagePreview();
+    });
+}
+
 /**
  * 初始化聊天通用功能
  */
 function initChatCommon() {
+    initMediaPreviewClicks();
     // 点击外部区域关闭文件类型选择卡片
     document.addEventListener('click', function(e) {
         const fileCards = document.getElementById('fileTypeCards');
@@ -529,6 +908,8 @@ function initChatCommon() {
         
         // 初始化消息气泡功能
         initMessageBubbles();
+        enhanceMediaElements(document.getElementById('messages-container'));
+        enhanceMediaElements(document.getElementById('pinned-messages-container'));
     });
 }
 
@@ -559,30 +940,29 @@ function initMessageBubbles() {
 
 // 显示消息气泡栏
 function showMessageBubble(messageElement) {
-    console.log('显示消息气泡');
     clearTimeout(messageHoverTimeout);
-    messageHoverTimeout = setTimeout(() => {
+    messageHoverTimeout = setTimeout(function() {
+        document.querySelectorAll('.message-bubble-bar.show').forEach(function(bar) {
+            if (!messageElement.contains(bar)) {
+                bar.classList.remove('show');
+            }
+        });
         const bubbleBar = messageElement.querySelector('.message-bubble-bar');
         if (bubbleBar) {
-            console.log('找到消息气泡栏，添加show类');
             bubbleBar.classList.add('show');
-        } else {
-            console.log('未找到消息气泡栏元素');
         }
-    }, 500); // 0.5秒后显示
+    }, 200);
 }
 
-// 隐藏消息气泡栏（延迟1秒）
+// 隐藏消息气泡栏
 function hideMessageBubble(messageElement) {
-    console.log('隐藏消息气泡');
     clearTimeout(messageHoverTimeout);
-    setTimeout(() => {
+    setTimeout(function() {
         const bubbleBar = messageElement.querySelector('.message-bubble-bar');
-        if (bubbleBar && !bubbleBar.matches(':hover')) {
-            console.log('隐藏消息气泡栏');
+        if (bubbleBar && !bubbleBar.matches(':hover') && !messageElement.matches(':hover')) {
             bubbleBar.classList.remove('show');
         }
-    }, 1000);
+    }, 300);
 }
 
 // 移动端长按检测相关变量
@@ -694,8 +1074,8 @@ function preventContextMenu(event) {
  */
 // 撤回消息
 function recallMessage(messageId) {
-    if (confirm('确定要撤回这条消息吗？')) {
-        fetch('/CHATTING/chat/recallMessage', {
+    if (confirm(chatT('confirm_recall'))) {
+        fetch('/Chat_System/chat/recallMessage', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -712,26 +1092,28 @@ function recallMessage(messageId) {
         })
         .then(data => {
             if (data.success) {
-                showNotification('消息已撤回', 'success');
-                // 刷新页面或更新消息显示
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                showNotification(chatT('recall_success'), 'success');
+                const roomId = window.currentRoomId;
+                if (roomId && typeof createMessageElement === 'function') {
+                    syncRoomMessages(roomId, createMessageElement, { forceScroll: false });
+                } else if (typeof refreshMessagesArea === 'function') {
+                    refreshMessagesArea(true);
+                }
             } else {
-                showNotification('撤回失败: ' + data.message, 'error');
+                showNotification(chatT('recall_failed') + ': ' + data.message, 'error');
             }
         })
         .catch(error => {
             console.error('撤回消息失败:', error);
-            showNotification('撤回失败，请重试', 'error');
+            showNotification(chatT('recall_failed_retry'), 'error');
         });
     }
 }
 
 // 删除消息
 function deleteMessage(messageId) {
-    if (confirm('确定要删除这条消息吗？')) {
-        fetch('/CHATTING/chat/deleteMessage', {
+    if (confirm(chatT('confirm_delete_message'))) {
+        fetch('/Chat_System/chat/deleteMessage', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -748,18 +1130,20 @@ function deleteMessage(messageId) {
         })
         .then(data => {
             if (data.success) {
-                showNotification('消息已删除', 'success');
-                // 刷新页面或更新消息显示
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                showNotification(chatT('delete_success'), 'success');
+                const roomId = window.currentRoomId;
+                if (roomId && typeof createMessageElement === 'function') {
+                    syncRoomMessages(roomId, createMessageElement, { forceScroll: false });
+                } else if (typeof refreshMessagesArea === 'function') {
+                    refreshMessagesArea(true);
+                }
             } else {
-                showNotification('删除失败: ' + data.message, 'error');
+                showNotification(chatT('delete_failed') + ': ' + data.message, 'error');
             }
         })
         .catch(error => {
             console.error('删除消息失败:', error);
-            showNotification('删除失败，请重试', 'error');
+            showNotification(chatT('delete_failed'), 'error');
         });
     }
 }
@@ -768,7 +1152,7 @@ function deleteMessage(messageId) {
 function editMessage(messageId, currentContent) {
     const newContent = prompt('修改消息内容:', currentContent);
     if (newContent !== null && newContent.trim() !== currentContent) {
-        fetch('/CHATTING/chat/editMessage', {
+        fetch('/Chat_System/chat/editMessage', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -785,18 +1169,20 @@ function editMessage(messageId, currentContent) {
         })
         .then(data => {
             if (data.success) {
-                showNotification('消息已修改', 'success');
-                // 刷新页面或更新消息显示
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                showNotification(chatT('message_edit_success'), 'success');
+                const roomId = window.currentRoomId;
+                if (roomId && typeof createMessageElement === 'function') {
+                    syncRoomMessages(roomId, createMessageElement, { forceScroll: false });
+                } else if (typeof refreshMessagesArea === 'function') {
+                    refreshMessagesArea(true);
+                }
             } else {
-                showNotification('修改失败: ' + data.message, 'error');
+                showNotification(chatT('message_edit_failed') + ': ' + data.message, 'error');
             }
         })
         .catch(error => {
             console.error('修改消息失败:', error);
-            showNotification('修改失败，请重试', 'error');
+            showNotification(chatT('message_edit_failed_retry'), 'error');
         });
     }
 }
@@ -813,7 +1199,7 @@ function updatePinnedMessagesDisplay() {
     console.log('Updating pinned messages display for room:', roomId);
     
     // 获取置顶消息
-    fetch(`/CHATTING/chat/getRoomMessages?room_id=${roomId}`)
+    fetch(`/Chat_System/chat/getRoomMessages?room_id=${roomId}`)
         .then(response => {
             console.log('Get messages response status:', response.status);
             return response.json();
@@ -849,6 +1235,7 @@ function updatePinnedMessagesDisplay() {
                     const messageElement = createPinnedMessageElement(message);
                     pinnedContainer.appendChild(messageElement);
                 });
+                enhanceMediaElements(pinnedContainer);
                 
                 // 如果没有置顶消息，隐藏容器
                 if (pinnedMessages.length === 0) {
@@ -891,7 +1278,7 @@ function createPinnedMessageElement(message) {
     // 生成头像HTML
     let avatarHtml = '';
     if (message.avatar && message.avatar !== 'default_avatar.png') {
-        avatarHtml = `<img src="/CHATTING/public/uploads/avatars/${message.avatar}" alt="${message.username}的头像">`;
+        avatarHtml = `<img src="/Chat_System/public/uploads/avatars/${message.avatar}" alt="${message.username}${chatT('avatar_alt_suffix')}">`;
     } else {
         avatarHtml = message.username.charAt(0).toUpperCase();
     }
@@ -908,10 +1295,10 @@ function createPinnedMessageElement(message) {
         messageContent = `
             <div class="voice-message">
                 <audio controls class="voice-player">
-                    <source src="/CHATTING/${message.file_path}" type="audio/webm">
-                    您的浏览器不支持音频播放。
+                    <source src="/Chat_System/${message.file_path}" type="audio/webm">
+                    ${chatT('audio_not_supported')}
                 </audio>
-                <div class="voice-duration">语音消息</div>
+                <div class="voice-duration">${chatT('voice_message')}</div>
             </div>
         `;
     } else if (message.file_path && !message.is_recalled) {
@@ -938,7 +1325,7 @@ function createPinnedMessageElement(message) {
                 } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
                     messageContent = `
                         <div class="file-message image-message">
-                            <img src="${fileUrl}" alt="图片" class="message-image">
+                            <img src="${fileUrl}" alt="${chatT('message_image_alt')}" class="message-image">
                         </div>
                     `;
                 } else {
@@ -948,9 +1335,9 @@ function createPinnedMessageElement(message) {
                                 <div class="file-icon">📄</div>
                                 <div class="file-details">
                                     <div class="file-name">${fileName}</div>
-                                    <div class="file-type">${fileExtension.toUpperCase()} 文件</div>
+                                    <div class="file-type">${chatT('file_type_with_ext', { ext: fileExtension.toUpperCase() })}</div>
                                 </div>
-                                <a href="${fileUrl}" download class="download-btn">下载</a>
+                                <a href="${fileUrl}" download class="download-btn">${chatT('download')}</a>
                             </div>
                         </div>
                     `;
@@ -996,7 +1383,7 @@ function createPinnedMessageElement(message) {
                 messageContent = `
                     <div class="file-message multiple-files-message">
                         ${collageHtml}
-                        <div class="files-info">${fileCount} 个文件</div>
+                        <div class="files-info">${chatT('message_files_count', { count: fileCount })}</div>
                     </div>
                 `;
             }
@@ -1005,7 +1392,7 @@ function createPinnedMessageElement(message) {
         messageContent = `
             <div class="recalled-message">
                 <span class="recall-icon">↩️</span>
-                <span class="recall-text">[撤回消息]</span>
+                <span class="recall-text">${chatT('message_recalled_label')}</span>
             </div>
         `;
     } else {
@@ -1077,7 +1464,7 @@ function getCurrentUserId() {
 
 // 切换收藏状态
 function toggleFavorite(messageId) {
-    fetch('/CHATTING/chat/toggleFavorite', {
+    fetch('/Chat_System/chat/toggleFavorite', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1124,7 +1511,7 @@ function toggleFavorite(messageId) {
 
 // 切换置顶状态
 function togglePin(messageId) {
-    fetch('/CHATTING/chat/togglePin', {
+    fetch('/Chat_System/chat/togglePin', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1248,8 +1635,8 @@ function quoteMessage(messageId) {
     const recalledMessage = messageElement.querySelector('.recalled-message');
     
     if (recalledMessage) {
-        messageType = '[撤回消息]';
-        messageContent = '此消息已被撤回';
+        messageType = chatT('message_recalled_label');
+        messageContent = chatT('message_recalled_desc');
     } else if (voiceMessage) {
         messageType = '[语音消息]';
         messageContent = '语音消息';
@@ -1260,7 +1647,7 @@ function quoteMessage(messageId) {
         } else {
             messageType = '[文件]';
         }
-        messageContent = '文件消息';
+        messageContent = chatT('file_message_text');
     }
     
     // 设置引用的消息ID
@@ -1487,7 +1874,7 @@ function loadForwardData(messageId) {
         recipientItem.setAttribute('data-recipient-id', `user_${friend.id}`);
         recipientItem.innerHTML = `
             <div class="recipient-avatar">
-                ${friend.avatar ? `<img src="/CHATTING/public/uploads/avatars/${friend.avatar}" alt="${friend.username}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : friend.username.charAt(0).toUpperCase()}
+                ${friend.avatar ? `<img src="/Chat_System/public/uploads/avatars/${friend.avatar}" alt="${friend.username}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : friend.username.charAt(0).toUpperCase()}
             </div>
             <div class="recipient-name">${friend.username}</div>
         `;
@@ -1508,7 +1895,7 @@ function loadForwardData(messageId) {
         recipientItem.setAttribute('data-recipient-id', `group_${group.id}`);
         recipientItem.innerHTML = `
             <div class="recipient-avatar">
-                ${group.avatar ? `<img src="/CHATTING/public/uploads/avatars/${group.avatar}" alt="${group.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : group.name.charAt(0).toUpperCase()}
+                ${group.avatar ? `<img src="/Chat_System/public/uploads/avatars/${group.avatar}" alt="${group.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : group.name.charAt(0).toUpperCase()}
             </div>
             <div class="recipient-name">${group.name}</div>
         `;
@@ -1546,7 +1933,7 @@ function sendForwardMessage() {
     
     const messageId = document.getElementById('forwardModal').getAttribute('data-message-id');
     
-    fetch('/CHATTING/chat/forwardMessage', {
+    fetch('/Chat_System/chat/forwardMessage', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1571,11 +1958,15 @@ function sendForwardMessage() {
     })
     .catch(error => {
         console.error('转发消息失败:', error);
-        showNotification('转发失败，请重试', 'error');
+        showNotification(chatT('send_failed_retry'), 'error');
     });
 }
 
 // 将函数暴露到全局作用域
+window.keepBubbleVisible = keepBubbleVisible;
+window.hideBubbleOnLeave = hideBubbleOnLeave;
+window.attachMessageBubbleBar = attachMessageBubbleBar;
+window.stampExistingMessageSignatures = stampExistingMessageSignatures;
 window.showMessageBubble = showMessageBubble;
 window.hideMessageBubble = hideMessageBubble;
 window.preventContextMenu = preventContextMenu;
@@ -1616,21 +2007,9 @@ if (typeof window.selectFileType === 'undefined') {
     };
 }
 
-if (typeof window.removeFilePreview === 'undefined') {
-    window.removeFilePreview = function() {
-        console.log('removeFilePreview called');
-    };
-}
-
 if (typeof window.addMoreFiles === 'undefined') {
     window.addMoreFiles = function() {
         console.log('addMoreFiles called');
-    };
-}
-
-if (typeof window.removeVoicePreview === 'undefined') {
-    window.removeVoicePreview = function() {
-        console.log('removeVoicePreview called');
     };
 }
 
@@ -1664,8 +2043,3 @@ if (typeof window.saveEditMessage === 'undefined') {
     };
 }
 
-if (typeof window.hideImagePreview === 'undefined') {
-    window.hideImagePreview = function() {
-        console.log('hideImagePreview called');
-    };
-}

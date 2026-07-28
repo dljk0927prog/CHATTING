@@ -78,19 +78,57 @@ class ChatController {
     // 显示视频通话页面
     public function videoCall() {
         $userId = $_SESSION['user_id'];
-        
+
         // 获取用户信息
         $user = $this->userModel->getUserById($userId);
-        
+
         // 获取好友列表（用于选择通话对象）
         $friends = $this->userModel->getFriends($userId);
-        
+
         $this->render('chat/videoCall', [
             'user' => $user,
             'friends' => $friends
         ]);
     }
-    
+
+    /** 语音/视频通话页面（简化版，带数据库信令） */
+    public function simple_call() {
+        $userId = $_SESSION['user_id'];
+        $roomId = isset($_GET['roomId']) ? (int)$_GET['roomId'] : 0;
+        $callType = isset($_GET['callType']) ? $_GET['callType'] : 'voice';
+        $fromUserId = isset($_GET['fromUserId']) ? (int)$_GET['fromUserId'] : 0;
+        $fromUsername = isset($_GET['fromUsername']) ? $_GET['fromUsername'] : '';
+        $isIncoming = isset($_GET['isIncoming']) && $_GET['isIncoming'] === 'true';
+        $callId = isset($_GET['callId']) ? $_GET['callId'] : '';
+
+        if ($roomId <= 0) {
+            header('Location: /Chat_System/dashboard');
+            exit;
+        }
+
+        $room = $this->chatModel->getRoomInfo($roomId, $userId);
+        if (!$room) {
+            header('Location: /Chat_System/dashboard');
+            exit;
+        }
+        // 私聊房间：对方用户 ID 与显示名
+        $receiverId = isset($room['partner_id']) ? (int)$room['partner_id'] : 0;
+        $partnerName = isset($room['display_name']) ? $room['display_name'] : '';
+
+        $user = $this->userModel->getUserById($userId);
+        $this->render('chat/simple_call', [
+            'roomId' => $roomId,
+            'callType' => $callType,
+            'fromUserId' => $fromUserId,
+            'fromUsername' => $fromUsername,
+            'isIncoming' => $isIncoming,
+            'callId' => $callId,
+            'receiverId' => $receiverId,
+            'partnerName' => $partnerName,
+            'user' => $user
+        ]);
+    }
+
     // 显示特定聊天房间
     public function room() {
         $userId = $_SESSION['user_id'];
@@ -246,7 +284,7 @@ class ChatController {
         }
         
         // 生成文件URL
-        $fileUrl = '/CHATTING/public/uploads/files/' . $fileName;
+        $fileUrl = '/Chat_System/public/uploads/files/' . $fileName;
         
         // 根据文件类型生成消息内容
         $content = '';
@@ -376,8 +414,12 @@ class ChatController {
         $result = $this->chatModel->sendVoiceMessage($roomId, $userId, $content, $voiceUrl);
         
         if ($result['success']) {
-            $result['voice_url'] = '/CHATTING/' . $voiceUrl;
+            $result['voice_url'] = '/Chat_System/' . $voiceUrl;
             $result['message_id'] = $result['message_id'];
+            $messageData = $this->chatModel->getMessageById($result['message_id']);
+            if ($messageData) {
+                $result['message'] = $messageData;
+            }
         }
         
         $this->jsonResponse($result);
@@ -488,7 +530,7 @@ class ChatController {
                     }
                     
                     // 生成文件URL
-                    $fileUrl = '/CHATTING/public/uploads/files/' . $fileName;
+                    $fileUrl = '/Chat_System/public/uploads/files/' . $fileName;
                     $fileUrls[] = $fileUrl;
                     $fileNames[] = $files['name'][$i];
                     $processedFiles++;
@@ -518,7 +560,7 @@ class ChatController {
                     }
                     
                     // 生成文件URL
-                    $fileUrl = '/CHATTING/public/uploads/files/' . $fileName;
+                    $fileUrl = '/Chat_System/public/uploads/files/' . $fileName;
                     $fileUrls[] = $fileUrl;
                     $fileNames[] = $files['name'];
                     $processedFiles++;
@@ -569,6 +611,10 @@ class ChatController {
                 $result['file_urls'] = $fileUrls;
                 $result['file_names'] = $fileNames;
                 $result['file_count'] = count($fileUrls);
+                $messageData = $this->chatModel->getMessageById($result['message_id']);
+                if ($messageData) {
+                    $result['message'] = $messageData;
+                }
             }
         } catch (Exception $e) {
             $result = ['success' => false, 'message' => '数据库操作失败: ' . $e->getMessage()];
@@ -1574,7 +1620,7 @@ class ChatController {
     
     // 重定向
     private function redirect($path) {
-        header("Location: /CHATTING" . $path);
+        header("Location: /Chat_System" . $path);
         exit;
     }
     
@@ -2384,7 +2430,30 @@ class ChatController {
             $this->jsonResponse(['success' => false, 'message' => '获取消息失败: ' . $e->getMessage()]);
         }
     }
-    
+    /** 代理获取 TURN 凭证（避免浏览器直连 Metered 被 CORS 拦截） */
+    public function getTurnCredentials() {
+        header('Content-Type: application/json');
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            echo json_encode([]);
+            return;
+        }
+        $configFile = defined('BASE_PATH') ? BASE_PATH . '/config/call-config.php' : (dirname(__DIR__, 2) . '/config/call-config.php');
+        $config = @include($configFile);
+        $url = isset($config['turn']['metered_api_url']) ? trim((string)$config['turn']['metered_api_url']) : '';
+        if ($url === '') {
+            echo json_encode([]);
+            return;
+        }
+        $ctx = stream_context_create(['http' => ['timeout' => 5]]);
+        $json = @file_get_contents($url, false, $ctx);
+        if ($json === false) {
+            echo json_encode([]);
+            return;
+        }
+        $data = json_decode($json, true);
+        echo is_array($data) ? json_encode($data) : $json;
+    }
+
     // 获取通话邀请
     public function getCallInvitations() {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

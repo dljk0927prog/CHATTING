@@ -10,7 +10,7 @@ require_once BASE_PATH . '/app/models/User.php';
 
 // 检查用户是否已登录（会话已在router.php中启动）
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /CHATTING/auth/login');
+    header('Location: /Chat_System/auth/login');
     exit;
 }
 
@@ -139,8 +139,8 @@ try {
     <meta name="format-detection" content="telephone=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title><?php echo __('forum_list_title'); ?> - CHATTING</title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <title><?php echo __('forum_list_title'); ?> - <?php echo __('app_name'); ?></title>
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         .forum-page-container {
             display: flex;
@@ -1270,7 +1270,7 @@ try {
             
             if (isJoined) {
                 statusBadge = '<span class="member-badge"><?php echo __('forum_joined'); ?></span>';
-                actionButton = `<a href="/CHATTING/forum/view?id=${forum.id}" class="view-btn">🚀 <?php echo __('forum_enter_forum'); ?></a>`;
+                actionButton = `<a href="/Chat_System/forum/view?id=${forum.id}" class="view-btn">🚀 <?php echo __('forum_enter_forum'); ?></a>`;
             } else if (hasPendingRequest) {
                 statusBadge = '<span class="pending-badge"><?php echo __('forum_pending'); ?></span>';
                 actionButton = `<button class="join-btn" disabled>⏳ <?php echo __('forum_applied'); ?></button>`;
@@ -1283,7 +1283,7 @@ try {
                     <div class="forum-header">
                         <div class="forum-avatar-large">
                             ${forum.avatar && forum.avatar !== 'default_forum_avatar.png' ? 
-                                `<img src="/CHATTING/public/uploads/avatars/${forum.avatar}" alt="论坛头像">` :
+                                `<img src="/Chat_System/public/uploads/avatars/${forum.avatar}" alt="论坛头像">` :
                                 forum.name.charAt(0).toUpperCase()
                             }
                         </div>
@@ -1424,7 +1424,7 @@ try {
                 button.disabled = true;
             }
             
-            fetch('/CHATTING/forum/requestJoin', {
+            fetch('/Chat_System/forum/requestJoin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

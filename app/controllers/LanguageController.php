@@ -16,7 +16,8 @@ class LanguageController {
     public function switch() {
         // 确保会话已启动
         if (session_status() == PHP_SESSION_NONE) {
-            session_start();
+            require_once BASE_PATH . '/core/session.php';
+            ensureSessionStarted();
         }
         
         // 获取语言参数
@@ -56,7 +57,8 @@ class LanguageController {
     public function getCurrentLanguage() {
         // 确保会话已启动
         if (session_status() == PHP_SESSION_NONE) {
-            session_start();
+            require_once BASE_PATH . '/core/session.php';
+            ensureSessionStarted();
         }
         
         $currentLanguage = $_SESSION['language'] ?? 'zh';

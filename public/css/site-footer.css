@@ -1,0 +1,71 @@
+.site-footer {
+    text-align: center;
+    padding: 12px 16px;
+    color: #555;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+.site-footer p {
+    margin: 0;
+}
+
+.site-footer--sidebar {
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
+    border-top: 1px solid #e1e5e9;
+    background: #fff;
+    color: #444;
+    padding: 12px 16px;
+}
+
+.site-footer--sidebar p {
+    max-width: 100%;
+    word-break: break-word;
+}
+
+.site-footer--inline {
+    padding: 6px 12px 8px;
+    background: #fff;
+    border-top: 1px solid #eef0f2;
+    color: #555;
+    font-size: 0.68rem;
+}
+
+.site-footer--auth {
+    text-align: center;
+    padding: 16px;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.75rem;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+/* 登录/注册/首页：页脚固定在视口底部 */
+body.page-with-footer {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body.page-with-footer .auth-container,
+body.page-with-footer .welcome-page-container {
+    flex: 1;
+    min-height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.site-footer--default {
+    background: transparent;
+}
+
+@media (max-width: 768px) {
+    .site-footer--sidebar {
+        font-size: 0.68rem;
+        padding: 8px 10px;
+    }
+}

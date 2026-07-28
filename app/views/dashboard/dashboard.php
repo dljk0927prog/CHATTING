@@ -15,7 +15,7 @@ $lang = Language::getInstance();
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo __('page_title_chat'); ?> - <?php echo htmlspecialchars($user['username']); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         /* 仪表板页面移动端优化 */
         @media (max-width: 768px) {
@@ -266,7 +266,7 @@ $lang = Language::getInstance();
         });
         
         function searchUsers(keyword) {
-            fetch(`/CHATTING/chat/searchUsers?q=${encodeURIComponent(keyword)}`)
+            fetch(`/Chat_System/chat/searchUsers?q=${encodeURIComponent(keyword)}`)
                 .then(response => response.json())
                 .then(data => {
                     const resultsContainer = document.getElementById('searchResults');
@@ -279,7 +279,7 @@ $lang = Language::getInstance();
                      resultsContainer.innerHTML = data.users.map(user => `
                          <div class="search-result-item" style="display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; transition: all 0.2s ease; cursor: pointer;" onmouseover="this.style.backgroundColor='#f8f9fa'; this.style.borderColor='#667eea';" onmouseout="this.style.backgroundColor='white'; this.style.borderColor='#eee';">
                              <div style="width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; flex-shrink: 0; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                 ${user.avatar ? `<img src="/CHATTING/public/uploads/avatars/${user.avatar}" alt="头像" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : user.username.charAt(0).toUpperCase()}
+                                 ${user.avatar ? `<img src="/Chat_System/public/uploads/avatars/${user.avatar}" alt="头像" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : user.username.charAt(0).toUpperCase()}
                              </div>
                              <div style="flex: 1; min-width: 0; margin-right: 8px;">
                                  <div style="font-weight: bold; font-size: 13px; margin-bottom: 2px; color: #333;">${user.username}</div>
@@ -297,7 +297,7 @@ $lang = Language::getInstance();
         
         // 发送好友请求
         function sendFriendRequest(friendId) {
-            fetch('/CHATTING/chat/sendFriendRequest', {
+            fetch('/Chat_System/chat/sendFriendRequest', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

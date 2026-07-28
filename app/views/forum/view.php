@@ -22,7 +22,7 @@ $lang = Language::getInstance();
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css?v=<?php echo time(); ?>">
     <style>
         /* 强制刷新头像样式 - 时间戳: <?php echo time(); ?> - 只作用于内容区域 */
         .forum-container .forum-avatar {
@@ -1636,7 +1636,7 @@ $lang = Language::getInstance();
                                 <?php 
                                 if (!empty($forum['avatar']) && $forum['avatar'] !== 'default_forum_avatar.png' && file_exists(dirname(__DIR__, 3) . '/public/uploads/avatars/' . $forum['avatar'])) {
                                     $timestamp = filemtime(dirname(__DIR__, 3) . '/public/uploads/avatars/' . $forum['avatar']);
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($forum['avatar']) . '?t=' . $timestamp . '" alt="' . __('avatar_forum') . '" class="forum-avatar">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($forum['avatar']) . '?t=' . $timestamp . '" alt="' . __('avatar_forum') . '" class="forum-avatar">';
                                 } else {
                                     echo '<div class="forum-avatar-default">' . strtoupper(substr($forum['name'], 0, 1)) . '</div>';
                                 }
@@ -1655,7 +1655,7 @@ $lang = Language::getInstance();
                                 $creatorName = $forum['creator_name'] ?? $forum['creator_username'] ?? 'Unknown';
                                 $creatorAvatar = $forum['creator_avatar'] ?? null;
                                 if (!empty($creatorAvatar) && $creatorAvatar !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $creatorAvatar)) {
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($creatorAvatar) . '" alt="' . __('avatar_creator') . '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($creatorAvatar) . '" alt="' . __('avatar_creator') . '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
                                 } else {
                                     echo strtoupper(substr($creatorName, 0, 1));
                                 }
@@ -1755,7 +1755,7 @@ $lang = Language::getInstance();
                                                         <?php 
                                                         $authorAvatar = $post['avatar'] ?? null;
                                                         if (!empty($authorAvatar) && $authorAvatar !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $authorAvatar)) {
-                                                            echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($authorAvatar) . '" alt="头像" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+                                                            echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($authorAvatar) . '" alt="头像" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
                                                         } else {
                                                             echo strtoupper(substr($post['username'], 0, 1));
                                                         }
@@ -1784,7 +1784,7 @@ $lang = Language::getInstance();
                                                 foreach ($post['media_files'] as $media): 
                                                     if ($displayCount >= $maxDisplay) break;
                                                     
-                                                    $filePath = '/CHATTING/public/uploads/files/' . $media['filename'];
+                                                    $filePath = '/Chat_System/public/uploads/files/' . $media['filename'];
                                                     $isImage = in_array($media['file_type'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
                                                     $isVideo = in_array($media['file_type'], ['video/mp4', 'video/webm', 'video/quicktime']);
                                                 ?>
@@ -1843,7 +1843,7 @@ $lang = Language::getInstance();
                                                         <?php 
                                                         $replyAvatar = $reply['avatar'] ?? null;
                                                         if (!empty($replyAvatar) && $replyAvatar !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $replyAvatar)) {
-                                                            echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($replyAvatar) . '" alt="头像">';
+                                                            echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($replyAvatar) . '" alt="头像">';
                                                         } else {
                                                             echo strtoupper(substr($reply['username'], 0, 1));
                                                         }
@@ -2230,7 +2230,7 @@ $lang = Language::getInstance();
         
         // 查看帖子详情
         function viewPost(postId) {
-            window.location.href = `/CHATTING/forum/post?id=${postId}`;
+            window.location.href = `/Chat_System/forum/post?id=${postId}`;
         }
         
         // 初始化搜索功能
@@ -2375,7 +2375,7 @@ $lang = Language::getInstance();
                                 <div class="post-author">
                                     <div class="author-avatar">
                                         ${post.avatar && post.avatar !== 'default_avatar.png' ? 
-                                            `<img src="/CHATTING/public/uploads/avatars/${post.avatar}" alt="头像" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` :
+                                            `<img src="/Chat_System/public/uploads/avatars/${post.avatar}" alt="头像" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` :
                                             post.username.charAt(0).toUpperCase()
                                         }
                                     </div>
@@ -2430,7 +2430,7 @@ $lang = Language::getInstance();
                 const media = mediaFiles[i];
                 console.log(`处理媒体文件 ${i}:`, media);
                 
-                const filePath = '/CHATTING/public/uploads/files/' + media.filename;
+                const filePath = '/Chat_System/public/uploads/files/' + media.filename;
                 const isImage = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(media.file_type);
                 const isVideo = ['video/mp4', 'video/webm', 'video/quicktime'].includes(media.file_type);
                 
@@ -2501,7 +2501,7 @@ $lang = Language::getInstance();
                     <li class="reply-preview-item">
                         <div class="reply-preview-avatar">
                             ${reply.avatar && reply.avatar !== 'default_avatar.png' ? 
-                                `<img src="/CHATTING/public/uploads/avatars/${reply.avatar}" alt="头像">` :
+                                `<img src="/Chat_System/public/uploads/avatars/${reply.avatar}" alt="头像">` :
                                 reply.username.charAt(0).toUpperCase()
                             }
                         </div>
@@ -2782,7 +2782,7 @@ $lang = Language::getInstance();
                     const formData = new FormData(this);
                     const forumId = document.getElementById('forumId').value;
                     
-                    fetch('/CHATTING/forum/createPost', {
+                    fetch('/Chat_System/forum/createPost', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -2869,7 +2869,7 @@ $lang = Language::getInstance();
                     console.log('Input元素中的文件:', inputFiles);
                     console.log('文件数量对比 - FormData:', formDataFiles.length, 'Input:', inputFiles.length);
                     
-                    fetch('/CHATTING/forum/createPostWithMedia', {
+                    fetch('/Chat_System/forum/createPostWithMedia', {
                         method: 'POST',
                         body: formData
                     })

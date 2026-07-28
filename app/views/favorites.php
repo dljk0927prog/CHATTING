@@ -1,7 +1,7 @@
 <?php
 // 收藏页面 - 检查用户是否已登录
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /CHATTING/auth/login");
+    header("Location: /Chat_System/auth/login");
     exit;
 }
 
@@ -19,7 +19,7 @@ $favoritesModel = new Favorites();
 $user = $userModel->getUserById($_SESSION['user_id']);
 
 if (!$user) {
-    header("Location: /CHATTING/auth/login");
+    header("Location: /Chat_System/auth/login");
     exit;
 }
 
@@ -39,7 +39,7 @@ $stats = $favoritesModel->getFavoritesStats($_SESSION['user_id']);
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo str_replace('{username}', htmlspecialchars($user['username']), __('favorites_page_title')); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         * {
             margin: 0;
@@ -1068,7 +1068,7 @@ $stats = $favoritesModel->getFavoritesStats($_SESSION['user_id']);
 <body>
     <div class="favorites-container">
         <!-- 返回按钮 -->
-        <a href="/CHATTING/dashboard" class="back-btn" title="<?php echo __('btn_back'); ?>"></a>
+        <a href="/Chat_System/dashboard" class="back-btn" title="<?php echo __('btn_back'); ?>"></a>
         
         <!-- 页面头部信息 -->
         <div class="header-section">
@@ -1189,8 +1189,8 @@ $stats = $favoritesModel->getFavoritesStats($_SESSION['user_id']);
                                             
                                             for ($i = 0; $i < $displayCount; $i++) {
                                                 $filePath = $fileUrls[$i];
-                                                if (strpos($filePath, '/CHATTING/') !== 0) {
-                                                    $filePath = '/CHATTING/public/uploads/files/' . basename($filePath);
+                                                if (strpos($filePath, '/Chat_System/') !== 0) {
+                                                    $filePath = '/Chat_System/public/uploads/files/' . basename($filePath);
                                                 }
                                                 
                                                 if ($i === 3 && count($fileUrls) > 4) {
@@ -1207,8 +1207,8 @@ $stats = $favoritesModel->getFavoritesStats($_SESSION['user_id']);
                                         } else {
                                             // 单文件显示
                                             $filePath = $favorite['file_path'];
-                                            if (strpos($filePath, '/CHATTING/') !== 0) {
-                                                $filePath = '/CHATTING/public/uploads/files/' . basename($filePath);
+                                            if (strpos($filePath, '/Chat_System/') !== 0) {
+                                                $filePath = '/Chat_System/public/uploads/files/' . basename($filePath);
                                             }
                                             
                                             if ($favorite['type'] === 'image'): ?>
@@ -1334,7 +1334,7 @@ $stats = $favoritesModel->getFavoritesStats($_SESSION['user_id']);
         // 删除收藏
         function deleteFavorite(favoriteId) {
             if (confirm('确定要删除这个收藏吗？')) {
-                fetch('/CHATTING/favorites/delete', {
+                fetch('/Chat_System/favorites/delete', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1379,7 +1379,7 @@ $stats = $favoritesModel->getFavoritesStats($_SESSION['user_id']);
         // 显示收藏的多文件图片预览
         function showFavoritesImagePreview(favoriteId, fileIndex) {
             // 获取收藏的完整文件信息
-            fetch(`/CHATTING/favorites/getFavoriteData?id=${favoriteId}`)
+            fetch(`/Chat_System/favorites/getFavoriteData?id=${favoriteId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.metadata) {
@@ -1626,5 +1626,6 @@ $stats = $favoritesModel->getFavoritesStats($_SESSION['user_id']);
             }
         });
     </script>
+    <?php $footerVariant = 'default'; include BASE_PATH . '/app/views/components/site-footer.php'; ?>
 </body>
 </html>

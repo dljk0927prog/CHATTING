@@ -1,9 +1,9 @@
 <?php
 // 聊天系统路由处理文件
-session_start();
-
-// 定义基础路径
 define('BASE_PATH', dirname(__DIR__));
+require_once __DIR__ . '/session.php';
+ensureSessionStarted();
+
 define('APP_PATH', BASE_PATH . '/app');
 define('VIEW_PATH', APP_PATH . '/views');
 define('MODEL_PATH', APP_PATH . '/models');
@@ -31,7 +31,7 @@ $request = $_SERVER['REQUEST_URI'];
 $path = parse_url($request, PHP_URL_PATH);
 
 // 移除项目根路径
-$projectPath = '/CHATTING';
+$projectPath = '/Chat_System';
 if (strpos($path, $projectPath) === 0) {
     $path = substr($path, strlen($projectPath));
 }
@@ -48,7 +48,7 @@ if (empty($path)) {
 
 // chat路由重定向到dashboard
 if ($path === 'chat') {
-    header("Location: /CHATTING/dashboard");
+    header("Location: /Chat_System/dashboard");
     exit;
 }
 
@@ -146,6 +146,10 @@ if ($path === 'profile/update') {
     if (strpos($path, 'chat/cancelCallInvitation') === 0) {
         $path = 'callInvitation/cancelCallInvitation';
     }
+    // 通话信令 API（WebRTC offer/answer/ice/end）
+    if (strpos($path, 'callSignal/') === 0) {
+        $path = $path;
+    }
     
     // 消息操作API路由处理
     if (strpos($path, 'chat/recallMessage') === 0) {
@@ -185,8 +189,9 @@ if ($path === 'profile/update') {
     if (strpos($path, 'chat/getRoomMessages') === 0) {
         $path = 'chat/getRoomMessages';
     }
-
-// 解析路由
+    if (strpos($path, 'chat/getTurnCredentials') === 0) {
+        $path = 'chat/getTurnCredentials';
+    }
 $segments = explode('/', $path);
 $controller = ucfirst($segments[0]) . 'Controller';
 $action = isset($segments[1]) ? $segments[1] : 'index';

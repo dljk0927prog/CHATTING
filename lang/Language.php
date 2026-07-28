@@ -12,7 +12,10 @@ class Language {
     private function __construct() {
         // 确保会话已启动
         if (session_status() == PHP_SESSION_NONE) {
-            session_start();
+            if (!function_exists('ensureSessionStarted')) {
+                require_once dirname(__DIR__) . '/core/session.php';
+            }
+            ensureSessionStarted();
         }
         $this->initializeLanguage();
     }

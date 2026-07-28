@@ -12,7 +12,7 @@ $lang = Language::getInstance();
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo __('auth_register_title'); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         /* 注册页面移动端优化 */
         @media (max-width: 768px) {
@@ -95,8 +95,8 @@ $lang = Language::getInstance();
         }
     </style>
 </head>
-<body>
-    <div class="auth-container">
+<body class="page-with-footer">
+    <div class="auth-container" style="padding-bottom: 60px; box-sizing: border-box;">
         <div class="auth-card">
             <div class="auth-header">
                 <h1><?php echo __('auth_create_account', '创建账户'); ?></h1>
@@ -113,7 +113,7 @@ $lang = Language::getInstance();
                 <?php endforeach; ?>
             <?php endif; ?>
             
-            <form method="POST" action="/CHATTING/auth/registerProcess">
+            <form method="POST" action="/Chat_System/auth/registerProcess">
                 <div class="form-group">
                     <label for="username"><?php echo __('auth_username'); ?></label>
                     <input type="text" id="username" name="username" required 
@@ -144,7 +144,7 @@ $lang = Language::getInstance();
             </form>
             
             <div class="auth-links">
-                <p><?php echo __('auth_has_account'); ?> <a href="/CHATTING/auth/login"><?php echo __('auth_login_here'); ?></a></p>
+                <p><?php echo __('auth_has_account'); ?> <a href="/Chat_System/auth/login"><?php echo __('auth_login_here'); ?></a></p>
             </div>
             
             <!-- 语言切换器 -->
@@ -204,5 +204,6 @@ $lang = Language::getInstance();
             }
         });
     </script>
+    <?php $footerVariant = 'auth'; include BASE_PATH . '/app/views/components/site-footer.php'; ?>
 </body>
 </html>

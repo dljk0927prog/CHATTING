@@ -1,0 +1,131 @@
+<style>
+    body{
+        background: rgb(2,0,36);
+        background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(30,160,223,0.025647759103641476) 18%, rgba(0,212,255,1) 100%);
+    }
+    .smalltext{
+        width: 50px;
+        padding: 5px;
+        margin: 10px;
+    }
+    .content{
+        margin-top: 10%;
+        border: 1px dotted black;
+        width: 500px;
+        padding: 20px;
+    }
+
+</style>
+
+<body>
+<div class="container">
+    <center>
+    <div class="content">
+    
+    <h2>Guess Password</h2>
+    <div id="guesspassword">
+    </div>
+    
+    <div id="message"></div>
+    <button type="button" onclick="startgame(this);">start</button>
+    </div>
+    </center>
+</div>
+</body>
+<script>
+const words = {
+    guesspass:null,
+    level:1,
+    gameover:10,
+};
+
+    function startgame(e){
+
+        let lvl=words.level;
+        words.gameover=10;
+        var pass
+        switch(lvl){
+            case 2:
+            pass=Math.floor(Math.random() * 90000) + 10000;
+            break;
+            case 3:
+            pass=Math.floor(Math.random() * 900000) + 100000;
+            break;
+            case 4:
+            pass=Math.floor(Math.random() * 9000000) + 1000000;
+            break;
+            case 5:
+            pass=Math.floor(Math.random() * 90000000) + 10000000;
+            break;
+            case 6:
+            pass=Math.floor(Math.random() * 900000000) + 100000000;
+            break;
+            default:
+            pass=Math.floor(Math.random() * 9000) + 1000;
+        }
+    
+        const eachnum=pass.toString().split("");
+
+        words.guesspass=pass;
+        let length=eachnum.length;
+
+        const replacedStr = pass.toString().replace(/\d/g, 'X ');
+        document.getElementById("guesspassword").innerHTML="<p id='password'>"+replacedStr+"</p>";
+        
+        for(let i=1;i<=length;i++){
+            document.getElementById("guesspassword").innerHTML+="<input type='number' min='0' max='9' value='' class='smalltext' />";
+        }
+        document.getElementById("guesspassword").innerHTML+="<br><button type='button' onclick='checknumber();'>Check number</button>";
+        e.parentNode.removeChild(e);
+        document.getElementById("message").innerHTML="";
+        
+    }
+
+    function checknumber(){
+        const txt=document.querySelectorAll(".smalltext");
+        
+        const eachnum=words.guesspass.toString().split("");
+        const leng=txt.length;
+        words.gameover=words.gameover-1;
+
+        console.log(words.guesspass);
+        let correct=0;
+        const password=document.getElementById("password").innerHTML;
+        for(let i=0;i<txt.length;i++){
+            let num=txt[i].value;
+            if(num==eachnum[i]){
+                txt[i].setAttribute("style","background-color:green");
+                correct++;
+            }else if(eachnum.includes(num)==true){
+                txt[i].setAttribute("style","background-color:yellow");
+            }else{
+                txt[i].setAttribute("style","background-color:white");
+            }
+        }
+        
+       
+       
+        if(words.gameover<=0){
+            
+            alert("Oh, you have stuck at "+words.level+", you may restart the game again");
+            window.location.href='guesspassword.html';
+        }else{
+            if(correct==leng){
+                document.getElementById("message").innerHTML+="<span style='color:light-green;'>congratulations you have complete level "+words.level+" test </span>";
+                words.level=words.level+1;
+                setTimeout(function(){
+                    document.getElementById("message").innerHTML+="<button type='button' onclick='startgame(this);'> next level</button>";
+                }, 2000);
+                
+                //document.getElementById("message").innerHTML="";
+            }else{
+                document.getElementById("message").innerHTML="Your tring time left "+words.gameover;
+            }
+        }
+
+       
+        
+    }
+
+    
+</script>

@@ -15,7 +15,7 @@ $lang = Language::getInstance();
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo str_replace(['{title}', '{forum_name}'], [htmlspecialchars($post['title']), htmlspecialchars($post['forum_name'])], __('post_view_title')); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         .post-container {
             height: 100%;
@@ -1133,7 +1133,7 @@ $lang = Language::getInstance();
                                     ⚙️ 管理帖子
                                 </button>
                                 <div class="management-dropdown" id="managementDropdown">
-                                    <a href="/CHATTING/forum/editPost?id=<?php echo $post['id']; ?>" class="dropdown-item">
+                                    <a href="/Chat_System/forum/editPost?id=<?php echo $post['id']; ?>" class="dropdown-item">
                                         ✏️ 编辑帖子
                                     </a>
                                     <button class="dropdown-item danger" onclick="deletePost(<?php echo $post['id']; ?>)">
@@ -1150,7 +1150,7 @@ $lang = Language::getInstance();
                                 <?php 
                                 $authorAvatar = $post['avatar'] ?? null;
                                 if (!empty($authorAvatar) && $authorAvatar !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $authorAvatar)) {
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($authorAvatar) . '" alt="头像">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($authorAvatar) . '" alt="头像">';
                                 } else {
                                     echo strtoupper(substr($post['username'], 0, 1));
                                 }
@@ -1185,7 +1185,7 @@ $lang = Language::getInstance();
                         <div class="media-grid">
                             <?php foreach ($post['media_files'] as $media): ?>
                                 <?php 
-                                $filePath = '/CHATTING/public/uploads/files/' . $media['filename'];
+                                $filePath = '/Chat_System/public/uploads/files/' . $media['filename'];
                                 $isImage = in_array($media['file_type'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
                                 $isVideo = in_array($media['file_type'], ['video/mp4', 'video/webm', 'video/quicktime']);
                                 ?>
@@ -1218,7 +1218,7 @@ $lang = Language::getInstance();
                     <?php endif; ?>
                     
                     <div class="post-actions">
-                        <a href="/CHATTING/forum/view?id=<?php echo $post['forum_id']; ?>" class="back-btn">
+                        <a href="/Chat_System/forum/view?id=<?php echo $post['forum_id']; ?>" class="back-btn">
                             ← 返回论坛
                         </a>
                         <div class="post-action-buttons">
@@ -1264,7 +1264,7 @@ $lang = Language::getInstance();
                                                 <?php 
                                                 $replyAvatar = $reply['avatar'] ?? null;
                                                 if (!empty($replyAvatar) && $replyAvatar !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $replyAvatar)) {
-                                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($replyAvatar) . '" alt="头像">';
+                                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($replyAvatar) . '" alt="头像">';
                                                 } else {
                                                     echo strtoupper(substr($reply['username'], 0, 1));
                                                 }
@@ -1365,7 +1365,7 @@ $lang = Language::getInstance();
             formData.append('post_id', document.getElementById('postId').value);
             formData.append('content', content);
             
-            fetch('/CHATTING/forum/replyPost', {
+            fetch('/Chat_System/forum/replyPost', {
                 method: 'POST',
                 body: formData
             })
@@ -1422,7 +1422,7 @@ $lang = Language::getInstance();
                     return;
                 }
                 
-                fetch('/CHATTING/forum/replyPost', {
+                fetch('/Chat_System/forum/replyPost', {
                     method: 'POST',
                     body: formData
                 })
@@ -1462,7 +1462,7 @@ $lang = Language::getInstance();
                 const formData = new FormData();
                 formData.append('post_id', postId);
                 
-                fetch('/CHATTING/forum/deletePost', {
+                fetch('/Chat_System/forum/deletePost', {
                     method: 'POST',
                     body: formData
                 })
@@ -1470,7 +1470,7 @@ $lang = Language::getInstance();
                 .then(data => {
                     if (data.success) {
                         alert('帖子删除成功！');
-                        window.location.href = '/CHATTING/forum/view?id=<?php echo $post['forum_id']; ?>';
+                        window.location.href = '/Chat_System/forum/view?id=<?php echo $post['forum_id']; ?>';
                     } else {
                         alert('删除失败: ' + data.message);
                     }

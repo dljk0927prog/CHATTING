@@ -1,14 +1,14 @@
 <?php
 // 检查会话状态
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /CHATTING/auth/login");
+    header("Location: /Chat_System/auth/login");
     exit;
 }
 
 // 检查必要的变量是否存在
 if (!isset($group) || !isset($members)) {
     error_log("groupSettings.php: Missing required variables - group or members not set");
-    header("Location: /CHATTING/dashboard");
+    header("Location: /Chat_System/dashboard");
     exit;
 }
 
@@ -37,7 +37,7 @@ $lang = Language::getInstance();
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo str_replace('{name}', htmlspecialchars($group['name']), __('page_title_group_settings')); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         * {
             margin: 0;
@@ -1249,7 +1249,7 @@ $lang = Language::getInstance();
                     <!-- 页面头部 -->
                     <div class="settings-header">
                         <div class="header-top">
-                            <a href="/CHATTING/chat/group?id=<?php echo $group['id']; ?>" class="back-btn">
+                            <a href="/Chat_System/chat/group?id=<?php echo $group['id']; ?>" class="back-btn">
                                 <span>←</span>
                                 <span><?php echo __('group_back_to_group'); ?></span>
                             </a>
@@ -1285,7 +1285,7 @@ $lang = Language::getInstance();
                                         if (!empty($group['avatar']) && $group['avatar'] !== 'default_group_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $group['avatar'])) {
                                             // 添加时间戳避免缓存问题
                                             $timestamp = filemtime(BASE_PATH . '/public/uploads/avatars/' . $group['avatar']);
-                                            echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($group['avatar']) . '?t=' . $timestamp . '" alt="' . __('avatar_group') . '">';
+                                            echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($group['avatar']) . '?t=' . $timestamp . '" alt="' . __('avatar_group') . '">';
                                         } else {
                                             echo strtoupper(substr($group['name'], 0, 1));
                                         }
@@ -1322,7 +1322,7 @@ $lang = Language::getInstance();
                                             <div class="member-avatar-small">
                                                 <?php 
                                                 if (!empty($member['avatar']) && $member['avatar'] !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $member['avatar'])) {
-                                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($member['avatar']) . '" alt="' . __('avatar_default') . '">';
+                                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($member['avatar']) . '" alt="' . __('avatar_default') . '">';
                                                 } else {
                                                     echo strtoupper(substr($member['username'], 0, 1));
                                                 }
@@ -1461,7 +1461,7 @@ $lang = Language::getInstance();
                             <div class="friend-avatar">
                                 <?php 
                                 if (!empty($friend['avatar']) && $friend['avatar'] !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $friend['avatar'])) {
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($friend['avatar']) . '" alt="' . __('avatar_default') . '">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($friend['avatar']) . '" alt="' . __('avatar_default') . '">';
                                 } else {
                                     echo strtoupper(substr($friend['username'], 0, 1));
                                 }
@@ -1510,7 +1510,7 @@ $lang = Language::getInstance();
                                 <div class="kick-member-avatar">
                                     <?php 
                                     if (!empty($member['avatar']) && $member['avatar'] !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $member['avatar'])) {
-                                        echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($member['avatar']) . '" alt="' . __('avatar_default') . '">';
+                                        echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($member['avatar']) . '" alt="' . __('avatar_default') . '">';
                                     } else {
                                         echo strtoupper(substr($member['username'], 0, 1));
                                     }
@@ -1575,7 +1575,7 @@ $lang = Language::getInstance();
                 return;
             }
             
-            fetch('/CHATTING/chat/updateGroupName', {
+            fetch('/Chat_System/chat/updateGroupName', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -1662,7 +1662,7 @@ $lang = Language::getInstance();
                     inviteBtn.textContent = '<?php echo __('inviting', '邀请中...'); ?>';
                 }
                 
-                fetch('/CHATTING/chat/addGroupMember', {
+                fetch('/Chat_System/chat/addGroupMember', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1725,7 +1725,7 @@ $lang = Language::getInstance();
         // 选择要踢出的成员
         function selectMemberToKick(memberId, username) {
             if (confirm(`<?php echo __('confirm_kick_member', '确定要将'); ?> ${username} <?php echo __('from_group', '踢出群组吗？'); ?>`)) {
-                fetch('/CHATTING/chat/removeGroupMember', {
+                fetch('/Chat_System/chat/removeGroupMember', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1761,7 +1761,7 @@ $lang = Language::getInstance();
         // 移除成员
         function removeMember(memberId, username) {
             if (confirm(`确定要将 ${username} 踢出群组吗？`)) {
-                fetch('/CHATTING/chat/removeGroupMember', {
+                fetch('/Chat_System/chat/removeGroupMember', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1795,7 +1795,7 @@ $lang = Language::getInstance();
         // 提升为管理员
         function promoteToAdmin(memberId, username) {
             if (confirm(`确定要将 ${username} 设为管理员吗？`)) {
-                fetch('/CHATTING/chat/promoteToAdmin', {
+                fetch('/Chat_System/chat/promoteToAdmin', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1829,7 +1829,7 @@ $lang = Language::getInstance();
         // 取消管理员
         function demoteToMember(memberId, username) {
             if (confirm(`确定要取消 ${username} 的管理员权限吗？`)) {
-                fetch('/CHATTING/chat/demoteToMember', {
+                fetch('/Chat_System/chat/demoteToMember', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1872,7 +1872,7 @@ $lang = Language::getInstance();
                 console.log('开始清空群聊记录...');
                 console.log('群组ID:', groupId);
                 
-                fetch('/CHATTING/chat/clearHistory', {
+                fetch('/Chat_System/chat/clearHistory', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1890,7 +1890,7 @@ $lang = Language::getInstance();
                         alert('✅ 群聊记录已清空');
                         // 可以选择跳转回群组页面或刷新当前页面
                         setTimeout(() => {
-                            window.location.href = `/CHATTING/chat/group?id=${groupId}`;
+                            window.location.href = `/Chat_System/chat/group?id=${groupId}`;
                         }, 1000);
                     } else {
                         alert('❌ 清空失败: ' + data.message);
@@ -1911,7 +1911,7 @@ $lang = Language::getInstance();
         function deleteGroup() {
             const groupName = '<?php echo htmlspecialchars($group['name']); ?>';
             if (confirm(`确定要解散群组 "${groupName}" 吗？`)) {
-                fetch('/CHATTING/chat/deleteGroup', {
+                fetch('/Chat_System/chat/deleteGroup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1922,7 +1922,7 @@ $lang = Language::getInstance();
                 .then(data => {
                     if (data.success) {
                         alert('✅ 群组已解散');
-                        window.location.href = '/CHATTING/dashboard';
+                        window.location.href = '/Chat_System/dashboard';
                     } else {
                         alert('❌ 解散失败: ' + data.message);
                     }
@@ -1984,7 +1984,7 @@ $lang = Language::getInstance();
             formData.append('avatar', selectedFile);
             formData.append('group_id', groupId);
             
-            fetch('/CHATTING/chat/updateGroupAvatar', {
+            fetch('/Chat_System/chat/updateGroupAvatar', {
                 method: 'POST',
                 body: formData
             })

@@ -123,7 +123,7 @@ class AuthController {
     
     // 重定向
     private function redirect($path) {
-        header("Location: /CHATTING" . $path);
+        header("Location: /Chat_System" . $path);
         exit;
     }
     

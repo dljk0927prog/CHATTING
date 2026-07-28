@@ -1206,7 +1206,7 @@ $lang = Language::getInstance();
         <div class="user-info">
             <div class="user-avatar" onclick="toggleUserMenu()">
                 <?php if (!empty($user['avatar']) && file_exists(BASE_PATH . '/public/uploads/avatars/' . $user['avatar'])): ?>
-                    <img src="/CHATTING/public/uploads/avatars/<?php echo htmlspecialchars($user['avatar']); ?>" alt="<?php echo __('avatar_default'); ?>">
+                    <img src="/Chat_System/public/uploads/avatars/<?php echo htmlspecialchars($user['avatar']); ?>" alt="<?php echo __('avatar_default'); ?>">
                 <?php else: ?>
                     <?php echo strtoupper(substr($user['username'] ?? 'U', 0, 1)); ?>
                 <?php endif; ?>
@@ -1273,7 +1273,7 @@ $lang = Language::getInstance();
                                 // 显示聊天对象的头像
                                 $roomAvatar = $roomItem['avatar'] ?? null;
                                 if (!empty($roomAvatar) && $roomAvatar !== 'default_avatar.png' && $roomAvatar !== 'group_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $roomAvatar)) {
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($roomAvatar) . '" alt="' . __('avatar_default') . '">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($roomAvatar) . '" alt="' . __('avatar_default') . '">';
                                 } else {
                                     echo strtoupper(substr($roomItem['display_name'], 0, 1));
                                 }
@@ -1320,7 +1320,7 @@ $lang = Language::getInstance();
                                         <?php echo __('chat_delete', '删除聊天'); ?>
                                     </div>
                                     <div class="room-dropdown-divider"></div>
-                                    <a href="/CHATTING/chat/roomDetails?id=<?php echo $roomItem['id']; ?>" class="room-dropdown-item info-item" onclick="event.stopPropagation();">
+                                    <a href="/Chat_System/chat/roomDetails?id=<?php echo $roomItem['id']; ?>" class="room-dropdown-item info-item" onclick="event.stopPropagation();">
                                         <span class="icon">ℹ️</span>
                                         <?php echo __('chat_details', '详细资料'); ?>
                                     </a>
@@ -1365,7 +1365,7 @@ $lang = Language::getInstance();
                                     // 检查文件是否存在
                                     $avatarPath = BASE_PATH . '/public/uploads/avatars/' . $avatarValue;
                                     if (file_exists($avatarPath)) {
-                                        echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($avatarValue) . '" alt="' . __('avatar_default') . '">';
+                                        echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($avatarValue) . '" alt="' . __('avatar_default') . '">';
                                     } else {
                                         echo strtoupper(substr($friend['username'], 0, 1));
                                     }
@@ -1425,7 +1425,7 @@ $lang = Language::getInstance();
                                 // 显示群组头像
                                 $groupAvatar = $groupItem['avatar'] ?? null;
                                 if (!empty($groupAvatar) && $groupAvatar !== 'default_group_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $groupAvatar)) {
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($groupAvatar) . '" alt="' . __('avatar_group') . '">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($groupAvatar) . '" alt="' . __('avatar_group') . '">';
                                 } else {
                                     echo strtoupper(substr($groupItem['name'], 0, 1));
                                 }
@@ -1474,7 +1474,7 @@ $lang = Language::getInstance();
                                 // 显示论坛头像
                                 $forumAvatar = $forum['avatar'] ?? null;
                                 if (!empty($forumAvatar) && $forumAvatar !== 'default_forum_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $forumAvatar)) {
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($forumAvatar) . '" alt="' . __('avatar_forum') . '">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($forumAvatar) . '" alt="' . __('avatar_forum') . '">';
                                 } else {
                                     echo strtoupper(substr($forum['name'], 0, 1));
                                 }
@@ -1522,7 +1522,7 @@ $lang = Language::getInstance();
                                     <div class="request-info">
                                         <div class="friend-avatar">
                                             <?php if (!empty($request['avatar']) && file_exists(BASE_PATH . '/public/uploads/avatars/' . $request['avatar'])): ?>
-                                                <img src="/CHATTING/public/uploads/avatars/<?php echo htmlspecialchars($request['avatar']); ?>" alt="<?php echo __('avatar_default'); ?>">
+                                                <img src="/Chat_System/public/uploads/avatars/<?php echo htmlspecialchars($request['avatar']); ?>" alt="<?php echo __('avatar_default'); ?>">
                                             <?php else: ?>
                                                 <?php echo strtoupper(substr($request['username'], 0, 1)); ?>
                                             <?php endif; ?>
@@ -1554,7 +1554,7 @@ $lang = Language::getInstance();
                                     <div class="request-info">
                                         <div class="friend-avatar">
                                             <?php if (!empty($invite['inviter_avatar']) && file_exists(BASE_PATH . '/public/uploads/avatars/' . $invite['inviter_avatar'])): ?>
-                                                <img src="/CHATTING/public/uploads/avatars/<?php echo htmlspecialchars($invite['inviter_avatar']); ?>" alt="<?php echo __('avatar_default'); ?>">
+                                                <img src="/Chat_System/public/uploads/avatars/<?php echo htmlspecialchars($invite['inviter_avatar']); ?>" alt="<?php echo __('avatar_default'); ?>">
                                             <?php else: ?>
                                                 <?php echo strtoupper(substr($invite['inviter_username'], 0, 1)); ?>
                                             <?php endif; ?>
@@ -1585,6 +1585,7 @@ $lang = Language::getInstance();
             </div>
         </div>
     </div>
+    <?php $footerVariant = 'sidebar'; include BASE_PATH . '/app/views/components/site-footer.php'; ?>
 </div>
 
 <!-- 设置模态框 -->
@@ -1661,7 +1662,7 @@ $lang = Language::getInstance();
     }
     
     function goToVideoCall() {
-        window.location.href = '/CHATTING/chat/videoCall';
+        window.location.href = '/Chat_System/chat/videoCall';
     }
     
     // 聊天房间点击
@@ -1672,9 +1673,9 @@ $lang = Language::getInstance();
             
             // 根据房间类型决定跳转页面
             if (roomType === 'group') {
-                window.location.href = `/CHATTING/chat/group?id=${roomId}`;
+                window.location.href = `/Chat_System/chat/group?id=${roomId}`;
             } else {
-                window.location.href = `/CHATTING/chat/room?id=${roomId}`;
+                window.location.href = `/Chat_System/chat/room?id=${roomId}`;
             }
         });
     });
@@ -1683,7 +1684,7 @@ $lang = Language::getInstance();
     document.querySelectorAll('.friend-item').forEach(item => {
         item.addEventListener('click', function() {
             const friendId = this.dataset.friendId;
-            window.location.href = `/CHATTING/chat/startChat?friend_id=${friendId}`;
+            window.location.href = `/Chat_System/chat/startChat?friend_id=${friendId}`;
         });
     });
     
@@ -1700,7 +1701,7 @@ $lang = Language::getInstance();
             // 为当前点击的群组添加active状态
             this.classList.add('active');
             
-            window.location.href = `/CHATTING/chat/group?id=${groupId}`;
+            window.location.href = `/Chat_System/chat/group?id=${groupId}`;
         });
     });
     
@@ -1723,7 +1724,7 @@ $lang = Language::getInstance();
             // 为当前点击的论坛添加active状态
             this.classList.add('active');
             
-            const targetUrl = `/CHATTING/forum/view?id=${forumId}`;
+            const targetUrl = `/Chat_System/forum/view?id=${forumId}`;
             console.log('Navigating to:', targetUrl);
             window.location.href = targetUrl;
         });
@@ -1731,7 +1732,7 @@ $lang = Language::getInstance();
     
     // 处理好友请求
     function handleFriendRequest(friendId, action) {
-        fetch('/CHATTING/chat/handleFriendRequest', {
+        fetch('/Chat_System/chat/handleFriendRequest', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1787,7 +1788,7 @@ $lang = Language::getInstance();
     
     // 处理论坛邀请
     function handleForumInvite(inviteId, action) {
-        fetch('/CHATTING/forum/handleInvite', {
+        fetch('/Chat_System/forum/handleInvite', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1817,7 +1818,7 @@ $lang = Language::getInstance();
                 
                 // 如果是接受邀请，可以跳转到论坛
                 if (action === 'accept' && data.forum_id) {
-                    window.location.href = `/CHATTING/forum/view?id=${data.forum_id}`;
+                    window.location.href = `/Chat_System/forum/view?id=${data.forum_id}`;
                 }
             } else {
                 alert('<?php echo __('operation_failed', '操作失败'); ?>: ' + data.message);
@@ -1847,23 +1848,23 @@ $lang = Language::getInstance();
     
     // 跳转到个人资料页面
     function goToProfile() {
-        window.location.href = '/CHATTING/profile';
+        window.location.href = '/Chat_System/profile';
     }
     
     // 跳转到收藏页面
     function goToFavorites() {
-        window.location.href = '/CHATTING/favorites';
+        window.location.href = '/Chat_System/favorites';
     }
     
     // 跳转到封锁列表页面
     function goToBlockedList() {
-        window.location.href = '/CHATTING/blocked';
+        window.location.href = '/Chat_System/blocked';
     }
     
     // 登出功能
     function logout() {
         if (confirm('<?php echo __('confirm_logout', '确定要退出登录吗？'); ?>')) {
-            window.location.href = '/CHATTING/auth/logout';
+            window.location.href = '/Chat_System/auth/logout';
         }
     }
     
@@ -2030,7 +2031,7 @@ $lang = Language::getInstance();
     
     // 添加好友功能
     function addFriend(username) {
-        fetch('/CHATTING/chat/addFriend', {
+        fetch('/Chat_System/chat/addFriend', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -2061,7 +2062,7 @@ $lang = Language::getInstance();
     
     // 创建群组功能
     function createGroup(groupName) {
-        fetch('/CHATTING/chat/createGroup', {
+        fetch('/Chat_System/chat/createGroup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -2086,7 +2087,7 @@ $lang = Language::getInstance();
     
     // 跳转到群组设置
     function goToGroupSettings(groupId) {
-        window.location.href = `/CHATTING/chat/groupSettings?id=${groupId}`;
+        window.location.href = `/Chat_System/chat/groupSettings?id=${groupId}`;
     }
     
     // 显示创建论坛弹窗
@@ -2100,7 +2101,7 @@ $lang = Language::getInstance();
     
     // 创建论坛功能
     function createForum(forumName, forumDescription) {
-        fetch('/CHATTING/forum/create', {
+        fetch('/Chat_System/forum/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -2125,12 +2126,12 @@ $lang = Language::getInstance();
     
     // 显示加入论坛弹窗
     function showJoinForumModal() {
-        window.location.href = '/CHATTING/list_forum';
+        window.location.href = '/Chat_System/list_forum';
     }
     
     // 加入论坛功能
     function joinForum(forumId) {
-        fetch('/CHATTING/forum/join', {
+        fetch('/Chat_System/forum/join', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -2155,7 +2156,7 @@ $lang = Language::getInstance();
     
     // 跳转到论坛设置
     function goToForumSettings(forumId) {
-        window.location.href = `/CHATTING/forum/settings?id=${forumId}`;
+        window.location.href = `/Chat_System/forum/settings?id=${forumId}`;
     }
     
     // 切换房间菜单
@@ -2176,7 +2177,7 @@ $lang = Language::getInstance();
     
     // 置顶房间
     function pinRoom(roomId) {
-        fetch('/CHATTING/chat/pinRoom', {
+        fetch('/Chat_System/chat/pinRoom', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -2346,7 +2347,7 @@ $lang = Language::getInstance();
         const confirmMessage = roomType === 'group' ? '<?php echo __('confirm_delete_group_chat', '确定要删除这个群组聊天吗？'); ?>' : '<?php echo __('confirm_delete_chat', '确定要删除这个聊天吗？'); ?>';
         
         if (confirm(confirmMessage)) {
-            fetch('/CHATTING/chat/deleteRoom', {
+            fetch('/Chat_System/chat/deleteRoom', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -2383,11 +2384,11 @@ $lang = Language::getInstance();
         if (roomType === 'group') {
             // 跳转到群组设置页面
             console.log('Navigating to group settings');
-            window.location.href = `/CHATTING/chat/groupSettings?id=${roomId}`;
+            window.location.href = `/Chat_System/chat/groupSettings?id=${roomId}`;
         } else {
             // 跳转到详细资料页面
             console.log('Navigating to room details');
-            window.location.href = `/CHATTING/chat/roomDetails?id=${roomId}`;
+            window.location.href = `/Chat_System/chat/roomDetails?id=${roomId}`;
         }
         
         // 关闭下拉菜单
@@ -2592,7 +2593,7 @@ $lang = Language::getInstance();
         }
         
         // 发送AJAX请求切换语言
-        fetch('/CHATTING/language/switch?lang=' + targetLang, {
+        fetch('/Chat_System/language/switch?lang=' + targetLang, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -2671,11 +2672,11 @@ window.showRoomInfo = function(roomId, roomType) {
     if (roomType === 'group') {
         // 跳转到群组设置页面
         console.log('Navigating to group settings');
-        window.location.href = `/CHATTING/chat/groupSettings?id=${roomId}`;
+        window.location.href = `/Chat_System/chat/groupSettings?id=${roomId}`;
     } else {
         // 跳转到详细资料页面
         console.log('Navigating to room details');
-        window.location.href = `/CHATTING/chat/roomDetails?id=${roomId}`;
+        window.location.href = `/Chat_System/chat/roomDetails?id=${roomId}`;
     }
     
     // 关闭下拉菜单
@@ -2684,4 +2685,158 @@ window.showRoomInfo = function(roomId, roomType) {
         dropdown.classList.add('hidden');
     }
 };
+</script>
+
+<script>
+window.sidebarI18n = <?php echo json_encode([
+    'online' => __('chat_online'),
+    'offline' => __('chat_offline'),
+    'away' => __('chat_away'),
+    'noMessage' => __('chat_no_message'),
+], JSON_UNESCAPED_UNICODE); ?>;
+
+function formatSidebarStatus(status) {
+    const i18n = window.sidebarI18n || {};
+    if (status === 'online') return i18n.online || 'Online';
+    if (status === 'away') return i18n.away || 'Away';
+    return i18n.offline || 'Offline';
+}
+
+function updateSidebarRoomList(rooms) {
+    const roomList = document.getElementById('room-list');
+    if (!roomList || !Array.isArray(rooms)) return;
+
+    const emptyState = roomList.querySelector('.empty-state');
+    if (rooms.length === 0) return;
+    if (emptyState) emptyState.remove();
+
+    const itemMap = new Map();
+    roomList.querySelectorAll('.room-item').forEach(function(li) {
+        itemMap.set(li.getAttribute('data-room-id'), li);
+    });
+
+    const activeId = roomList.querySelector('.room-item.active')?.getAttribute('data-room-id');
+    const fragment = document.createDocumentFragment();
+
+    rooms.forEach(function(room) {
+        const id = String(room.id);
+        const li = itemMap.get(id);
+        if (!li) return;
+
+        const lastMsg = li.querySelector('.room-last-message');
+        if (lastMsg) {
+            lastMsg.textContent = room.last_message || (window.sidebarI18n?.noMessage || '');
+        }
+
+        if (room.type === 'private') {
+            const avatar = li.querySelector('.room-avatar');
+            if (avatar) {
+                let indicator = avatar.querySelector('.status-indicator');
+                if (room.status === 'online' || room.status === 'away') {
+                    if (!indicator) {
+                        indicator = document.createElement('div');
+                        avatar.appendChild(indicator);
+                    }
+                    indicator.className = 'status-indicator status-' + room.status;
+                } else if (indicator) {
+                    indicator.remove();
+                }
+            }
+        }
+
+        let badge = li.querySelector('.unread-badge');
+        const unread = parseInt(room.unread_count, 10) || 0;
+        if (unread > 0) {
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.className = 'unread-badge';
+                li.appendChild(badge);
+            }
+            badge.textContent = unread;
+        } else if (badge) {
+            badge.remove();
+        }
+
+        li.classList.toggle('pinned', !!room.pinned);
+        li.classList.toggle('active', activeId === id);
+        fragment.appendChild(li);
+    });
+
+    if (fragment.childNodes.length > 0) {
+        roomList.innerHTML = '';
+        roomList.appendChild(fragment);
+    }
+}
+
+function updateSidebarFriendList(friends) {
+    const friendList = document.getElementById('friend-list');
+    if (!friendList || !Array.isArray(friends)) return;
+
+    friends.forEach(function(friend) {
+        const li = friendList.querySelector('.friend-item[data-friend-id="' + friend.id + '"]');
+        if (!li) return;
+
+        const indicator = li.querySelector('.status-indicator');
+        if (indicator) {
+            indicator.className = 'status-indicator status-' + (friend.status || 'offline');
+        }
+
+        const statusEl = li.querySelector('.friend-status');
+        if (statusEl) {
+            statusEl.textContent = formatSidebarStatus(friend.status || 'offline');
+        }
+    });
+}
+
+function updateChatHeaderStatus(rooms) {
+    const roomId = window.currentRoomId || window.currentChatRoomId;
+    if (!roomId || !Array.isArray(rooms)) return;
+
+    const room = rooms.find(function(r) { return String(r.id) === String(roomId); });
+    if (!room || room.type !== 'private') return;
+
+    const chatStatus = document.querySelector('.chat-status');
+    if (chatStatus) {
+        chatStatus.textContent = formatSidebarStatus(room.status || 'offline');
+    }
+}
+
+function refreshSidebar() {
+    const activeRoom = window.currentRoomId || window.currentChatRoomId;
+    let url = '/Chat_System/dashboard/getSidebarData';
+    if (activeRoom) {
+        url += '?active_room_id=' + encodeURIComponent(activeRoom);
+    }
+    fetch(url, {
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (!data.success) return;
+
+        const userStatusEl = document.querySelector('.sidebar-header .user-details p');
+        if (userStatusEl && data.user) {
+            userStatusEl.textContent = formatSidebarStatus(data.user.status || 'offline');
+        }
+
+        updateSidebarRoomList(data.rooms);
+        updateSidebarFriendList(data.friends);
+        updateChatHeaderStatus(data.rooms);
+    })
+    .catch(function(err) {
+        console.error('refreshSidebar failed:', err);
+    });
+}
+
+window.refreshSidebar = refreshSidebar;
+
+document.addEventListener('DOMContentLoaded', function() {
+    refreshSidebar();
+    setInterval(refreshSidebar, 2000);
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) refreshSidebar();
+    });
+    window.addEventListener('focus', refreshSidebar);
+});
 </script>

@@ -63,7 +63,7 @@ class DashboardController {
     
     // 重定向
     private function redirect($path) {
-        header("Location: /CHATTING" . $path);
+        header("Location: /Chat_System" . $path);
         exit;
     }
     
@@ -85,6 +85,61 @@ class DashboardController {
     private function render($view, $data = []) {
         extract($data);
         include __DIR__ . '/../views/' . $view . '.php';
+    }
+
+    // 侧边栏实时数据（聊天列表、在线状态、未读数）
+    public function getSidebarData() {
+        $userId = $_SESSION['user_id'];
+        $activeRoomId = isset($_GET['active_room_id']) ? (int)$_GET['active_room_id'] : 0;
+        $user = $this->userModel->getUserById($userId);
+        $rooms = $this->chatModel->getUserRooms($userId);
+        $friends = $this->userModel->getFriends($userId);
+
+        $roomsData = array_map(function ($room) use ($activeRoomId) {
+            $unread = (int)($room['unread_count'] ?? 0);
+            if ($activeRoomId > 0 && (int)$room['id'] === $activeRoomId) {
+                $unread = 0;
+            }
+            return [
+                'id' => (int)$room['id'],
+                'type' => $room['type'],
+                'display_name' => $room['display_name'] ?? '',
+                'nickname' => $room['nickname'] ?? null,
+                'avatar' => $room['avatar'] ?? null,
+                'status' => $room['status'] ?? 'offline',
+                'last_message' => $room['last_message'] ?? null,
+                'last_message_time' => $room['last_message_time'] ?? null,
+                'unread_count' => $unread,
+                'pinned' => !empty($room['pinned']),
+            ];
+        }, $rooms);
+
+        $friendsData = array_map(function ($friend) {
+            return [
+                'id' => (int)$friend['id'],
+                'username' => $friend['username'] ?? '',
+                'nickname' => $friend['nickname'] ?? null,
+                'avatar' => $friend['avatar'] ?? null,
+                'status' => $friend['status'] ?? 'offline',
+            ];
+        }, $friends);
+
+        $this->jsonResponse([
+            'success' => true,
+            'user' => [
+                'id' => (int)$user['id'],
+                'username' => $user['username'],
+                'status' => $user['status'] ?? 'offline',
+            ],
+            'rooms' => $roomsData,
+            'friends' => $friendsData,
+        ]);
+    }
+
+    private function jsonResponse($data) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
+        exit;
     }
 }
 ?>

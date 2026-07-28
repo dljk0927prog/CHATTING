@@ -15,7 +15,7 @@ $chatModel = new Chat();
 // 获取当前群组信息
 $groupId = $_GET['id'] ?? null;
 if (!$groupId) {
-    header("Location: /CHATTING/dashboard");
+    header("Location: /Chat_System/dashboard");
     exit;
 }
 
@@ -23,7 +23,7 @@ $group = $chatModel->getGroupInfo($groupId, $_SESSION['user_id']);
 if (!$group) {
     // 记录调试信息
     error_log("用户 {$_SESSION['user_id']} 尝试访问群组 $groupId 但无权限");
-    header("Location: /CHATTING/dashboard");
+    header("Location: /Chat_System/dashboard");
     exit;
 }
 
@@ -36,7 +36,7 @@ echo "<!-- 调试信息: 群组ID={$group['id']}, 名称={$group['name']} -->";
 
 // 检查房间类型，如果是私聊，重定向到私聊页面
 if ($group['type'] === 'private') {
-    header("Location: /CHATTING/chat/room?id=" . $groupId);
+    header("Location: /Chat_System/chat/room?id=" . $groupId);
     exit;
 }
 
@@ -61,7 +61,9 @@ $members = $chatModel->getGroupMembers($groupId);
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title><?php echo htmlspecialchars($group['name']); ?> - <?php echo __('page_title_chat'); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/message-bubble-bar.css?v=1">
+    <link rel="stylesheet" href="/Chat_System/public/css/media-preview.css?v=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* 群组聊天页面样式 */
@@ -263,6 +265,7 @@ $members = $chatModel->getGroupMembers($groupId);
             display: flex;
             margin-bottom: 15px;
             animation: fadeInUp 0.3s ease;
+            position: relative;
         }
         
         .message.own {
@@ -1934,7 +1937,7 @@ $members = $chatModel->getGroupMembers($groupId);
                         if (!empty($group['avatar']) && $group['avatar'] !== 'default_group_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $group['avatar'])) {
                             // 添加时间戳避免缓存问题
                             $timestamp = filemtime(BASE_PATH . '/public/uploads/avatars/' . $group['avatar']);
-                            echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($group['avatar']) . '?t=' . $timestamp . '" alt="' . __('avatar_group') . '">';
+                            echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($group['avatar']) . '?t=' . $timestamp . '" alt="' . __('avatar_group') . '">';
                         } else {
                             echo strtoupper(substr($group['name'], 0, 1));
                         }
@@ -1994,7 +1997,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     <?php 
                                     $messageAvatar = $message['avatar'] ?? null;
                                     if (!empty($messageAvatar) && $messageAvatar !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $messageAvatar)) {
-                                        echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($messageAvatar) . '" alt="' . __('message_avatar_alt') . '">';
+                                        echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($messageAvatar) . '" alt="' . __('message_avatar_alt') . '">';
                                     } else {
                                         echo strtoupper(substr($message['username'], 0, 1));
                                     }
@@ -2010,7 +2013,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     if (!empty($message['quoted_content'])): ?>
                                         <div class="quoted-message">
                                             <div class="quoted-header">
-                                                <span class="quoted-label">引用</span>
+                                                <span class="quoted-label"><?php echo __('quote_label'); ?></span>
                                                 <span class="quoted-sender"><?php echo htmlspecialchars($message['quoted_username']); ?></span>
                                             </div>
                                             <div class="quoted-content">
@@ -2029,7 +2032,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     ?>
                                         <div class="recalled-message">
                                             <span class="recall-icon">↩️</span>
-                                            <span class="recall-text">[撤回消息]</span>
+                                            <span class="recall-text"><?php echo __('message_recalled_label'); ?></span>
                                         </div>
                                     <?php 
                                     elseif ($message['message_type'] === 'voice'): 
@@ -2037,7 +2040,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     ?>
                                         <div class="voice-message">
                                             <audio controls class="voice-player">
-                                                <source src="/CHATTING/<?php echo htmlspecialchars($message['file_path']); ?>" type="audio/webm">
+                                                <source src="/Chat_System/<?php echo htmlspecialchars($message['file_path']); ?>" type="audio/webm">
                                                 您的浏览器不支持音频播放。
                                             </audio>
                                         </div>
@@ -2046,7 +2049,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     ?>
                                         <div class="recalled-message">
                                             <span class="recall-icon">↩️</span>
-                                            <span class="recall-text">[撤回消息]</span>
+                                            <span class="recall-text"><?php echo __('message_recalled_label'); ?></span>
                                         </div>
                                     <?php 
                                     elseif (!empty($message['file_path'])): 
@@ -2116,7 +2119,6 @@ $members = $chatModel->getGroupMembers($groupId);
                                                         <a href="<?php echo $fileUrl; ?>" download class="download-btn">下载</a>
                                                     </div>
                                                 <?php endif; ?>
-                                                <div class="file-name"><?php echo htmlspecialchars($message['content']); ?></div>
                                             </div>
                                         <?php } ?>
                                     <?php 
@@ -2124,7 +2126,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     ?>
                                         <div class="recalled-message">
                                             <span class="recall-icon">↩️</span>
-                                            <span class="recall-text">[撤回消息]</span>
+                                            <span class="recall-text"><?php echo __('message_recalled_label'); ?></span>
                                         </div>
                                     <?php 
                                     else: 
@@ -2180,7 +2182,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     <?php 
                                     $messageAvatar = $message['avatar'] ?? null;
                                     if (!empty($messageAvatar) && $messageAvatar !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $messageAvatar)) {
-                                        echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($messageAvatar) . '" alt="' . __('message_avatar_alt') . '">';
+                                        echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($messageAvatar) . '" alt="' . __('message_avatar_alt') . '">';
                                     } else {
                                         echo strtoupper(substr($message['username'], 0, 1));
                                     }
@@ -2196,7 +2198,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     if (!empty($message['quoted_content'])): ?>
                                         <div class="quoted-message">
                                             <div class="quoted-header">
-                                                <span class="quoted-label">引用</span>
+                                                <span class="quoted-label"><?php echo __('quote_label'); ?></span>
                                                 <span class="quoted-sender"><?php echo htmlspecialchars($message['quoted_username']); ?></span>
                                             </div>
                                             <div class="quoted-content">
@@ -2215,7 +2217,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     ?>
                                         <div class="recalled-message">
                                             <span class="recall-icon">↩️</span>
-                                            <span class="recall-text">[撤回消息]</span>
+                                            <span class="recall-text"><?php echo __('message_recalled_label'); ?></span>
                                         </div>
                                     <?php 
                                     elseif ($message['message_type'] === 'voice'): 
@@ -2223,7 +2225,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     ?>
                                         <div class="voice-message">
                                             <audio controls class="voice-player">
-                                                <source src="/CHATTING/<?php echo htmlspecialchars($message['file_path']); ?>" type="audio/webm">
+                                                <source src="/Chat_System/<?php echo htmlspecialchars($message['file_path']); ?>" type="audio/webm">
                                                 您的浏览器不支持音频播放。
                                             </audio>
                                             <div class="voice-duration">语音消息</div>
@@ -2233,7 +2235,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     ?>
                                         <div class="recalled-message">
                                             <span class="recall-icon">↩️</span>
-                                            <span class="recall-text">[撤回消息]</span>
+                                            <span class="recall-text"><?php echo __('message_recalled_label'); ?></span>
                                         </div>
                                     <?php 
                                     elseif (!empty($message['file_path'])): 
@@ -2278,9 +2280,6 @@ $members = $chatModel->getGroupMembers($groupId);
                                                             </div>
                                                             <a href="<?php echo htmlspecialchars($fileUrl); ?>" download class="download-btn">下载</a>
                                                         </div>
-                                                    <?php endif; ?>
-                                                    <?php if (!in_array($fileExtension, ['zip', 'rar', '7z', 'tar', 'gz', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'])): ?>
-                                                        <div class="file-name"><?php echo htmlspecialchars($message['content']); ?></div>
                                                     <?php endif; ?>
                                                 </div>
                                             <?php } else {
@@ -2373,7 +2372,6 @@ $members = $chatModel->getGroupMembers($groupId);
                                                         <a href="<?php echo htmlspecialchars($fileUrl); ?>" download class="download-btn">下载</a>
                                                     </div>
                                                 <?php endif; ?>
-                                                <div class="file-name"><?php echo htmlspecialchars($message['content']); ?></div>
                                             </div>
                                         <?php } ?>
                                     <?php 
@@ -2381,7 +2379,7 @@ $members = $chatModel->getGroupMembers($groupId);
                                     ?>
                                         <div class="recalled-message">
                                             <span class="recall-icon">↩️</span>
-                                            <span class="recall-text">[撤回消息]</span>
+                                            <span class="recall-text"><?php echo __('message_recalled_label'); ?></span>
                                         </div>
                                     <?php 
                                     else: 
@@ -2422,7 +2420,7 @@ $members = $chatModel->getGroupMembers($groupId);
                     <!-- 文件预览区域 -->
                     <div class="file-preview-area hidden" id="filePreviewArea">
                         <div class="preview-header">
-                            <span class="preview-title">文件预览</span>
+                            <span class="preview-title"><?php echo __('file_preview'); ?></span>
                             <button class="remove-preview-btn" onclick="removeFilePreview()">×</button>
                         </div>
                         <div class="preview-content" id="previewContent"></div>
@@ -2435,7 +2433,7 @@ $members = $chatModel->getGroupMembers($groupId);
                     <!-- 语音预览区域 -->
                     <div class="voice-preview-area hidden" id="voicePreviewArea">
                         <div class="preview-header">
-                            <span class="preview-title">语音预览</span>
+                            <span class="preview-title"><?php echo __('voice_preview'); ?></span>
                             <button class="remove-preview-btn" onclick="removeVoicePreview()">×</button>
                         </div>
                         <div class="voice-preview-content" id="voicePreviewContent">
@@ -2531,7 +2529,7 @@ $members = $chatModel->getGroupMembers($groupId);
     <div class="image-preview-modal hidden" id="imagePreviewModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>图片预览</h3>
+                <h3><?php echo __('image_preview_title'); ?></h3>
                 <button class="close-btn" onclick="hideImagePreview()">&times;</button>
             </div>
             <div class="modal-body">
@@ -2550,14 +2548,18 @@ $members = $chatModel->getGroupMembers($groupId);
         </div>
     </div>
     
-    <!-- 引入聊天通用功能 -->
-    <script src="/CHATTING/public/js/chat-common.js?v=2025012723"></script>
+    <!-- 聊天 i18n + 通用功能 -->
+    <?php include BASE_PATH . '/app/views/components/chat-i18n.php'; ?>
+    <script src="/Chat_System/public/js/chat-common.js?v=2025012728"></script>
     
     <!-- 提供好友和群组数据给JavaScript -->
     <script>
         // 将PHP数据传递给JavaScript
         window.friendsData = <?php echo json_encode($friends); ?>;
         window.groupsData = <?php echo json_encode($groups); ?>;
+        
+        window.currentUserId = <?php echo (int)$_SESSION['user_id']; ?>;
+        window.currentRoomId = <?php echo $group['id']; ?>;
         
         // 当前聊天信息
         window.currentChat = {
@@ -2573,35 +2575,13 @@ $members = $chatModel->getGroupMembers($groupId);
     </script>
     
     <script>
-        // 消息气泡栏功能现在在chat-common.js中统一处理
-        
-        // 确保函数存在，如果不存在则定义空函数
-        if (typeof showMessageBubble === 'undefined') {
-            window.showMessageBubble = function(messageElement) {
-                console.log('showMessageBubble fallback function called');
-                clearTimeout(messageHoverTimeout);
-                messageHoverTimeout = setTimeout(() => {
-                    const bubbleBar = messageElement.querySelector('.message-bubble-bar');
-                    if (bubbleBar) {
-                        bubbleBar.classList.add('show');
-                    }
-                }, 500);
-            };
-        }
-        
-        if (typeof hideMessageBubble === 'undefined') {
-            window.hideMessageBubble = function(messageElement) {
-                console.log('hideMessageBubble fallback function called');
-                clearTimeout(messageHoverTimeout);
-                setTimeout(() => {
-                    const bubbleBar = messageElement.querySelector('.message-bubble-bar');
-                    if (bubbleBar && !bubbleBar.matches(':hover')) {
-                        bubbleBar.classList.remove('show');
-                    }
-                }, 1000);
-            };
-        }
-        
+        document.addEventListener('DOMContentLoaded', function() {
+            stampExistingMessageSignatures(<?php echo (int)$group['id']; ?>);
+        });
+    </script>
+    
+    <script>
+        // 触摸与右键相关兜底（chat-common.js 已提供主实现）
         if (typeof preventContextMenu === 'undefined') {
             window.preventContextMenu = function(event) {
                 event.preventDefault();
@@ -2801,7 +2781,7 @@ $members = $chatModel->getGroupMembers($groupId);
                     const messageId = parentMessage.getAttribute('data-message-id');
                     if (messageId) {
                         // 从数据库获取引用关系
-                        fetch(`/CHATTING/chat/getQuotedMessageId?message_id=${messageId}`)
+                        fetch(`/Chat_System/chat/getQuotedMessageId?message_id=${messageId}`)
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success && data.quoted_message_id) {
@@ -2838,7 +2818,11 @@ $members = $chatModel->getGroupMembers($groupId);
             // 创建新消息元素
             const messageElement = createMessageElement(messageData);
             if (messageElement) {
+                messageElement.setAttribute('data-msg-sig', getMessageSignature(messageData));
                 messagesContainer.appendChild(messageElement);
+                if (typeof enhanceMediaElements === 'function') {
+                    enhanceMediaElements(messageElement);
+                }
                 
                 // 为新消息添加事件监听器
                 addMessageEventListeners(messageElement);
@@ -2858,15 +2842,21 @@ $members = $chatModel->getGroupMembers($groupId);
             
             let messageContent = '';
             
-            // 根据消息类型生成内容
-            if (messageData.message_type === 'voice') {
+            if (messageData.is_recalled) {
+                messageContent = `
+                    <div class="recalled-message">
+                        <span class="recall-icon">↩️</span>
+                        <span class="recall-text">${chatT('message_recalled_label')}</span>
+                    </div>
+                `;
+            } else if (messageData.message_type === 'voice') {
                 messageContent = `
                     <div class="voice-message">
                         <audio controls class="voice-player">
-                            <source src="/CHATTING/${messageData.file_path}" type="audio/webm">
-                            您的浏览器不支持音频播放。
+                            <source src="/Chat_System/${messageData.file_path}" type="audio/webm">
+                            ${chatT('audio_not_supported')}
                         </audio>
-                        <div class="voice-duration">语音消息</div>
+                        <div class="voice-duration">${chatT('voice_message')}</div>
                     </div>
                 `;
             } else if (messageData.file_path) {
@@ -2883,14 +2873,12 @@ $members = $chatModel->getGroupMembers($groupId);
                                 <video controls class="message-video">
                                     <source src="${fileUrl}" type="video/${fileExtension}">
                                 </video>
-                                <div class="file-name">${messageData.content}</div>
                             </div>
                         `;
                     } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
                         messageContent = `
                             <div class="file-message image-message">
-                                <img src="${fileUrl}" alt="图片" class="message-image">
-                                <div class="file-name">${messageData.content}</div>
+                                <img src="${fileUrl}" alt="${chatT('message_image_alt')}" class="message-image">
                             </div>
                         `;
                     } else {
@@ -2900,9 +2888,9 @@ $members = $chatModel->getGroupMembers($groupId);
                                     <div class="file-icon">📄</div>
                                     <div class="file-details">
                                         <div class="file-name">${fileName}</div>
-                                        <div class="file-type">${fileExtension.toUpperCase()} 文件</div>
+                                        <div class="file-type">${chatT('file_type_with_ext', { ext: fileExtension.toUpperCase() })}</div>
                                     </div>
-                                    <a href="${fileUrl}" download class="download-btn">下载</a>
+                                    <a href="${fileUrl}" download class="download-btn">${chatT('download')}</a>
                                 </div>
                                 <div class="file-name">${messageData.content}</div>
                             </div>
@@ -2918,14 +2906,14 @@ $members = $chatModel->getGroupMembers($groupId);
             // 处理引用消息 - 使用与room.php相同的格式
             let quotedContent = '';
             if (messageData.quoted_content) {
-                const quotedSenderName = messageData.quoted_username || '未知用户';
+                const quotedSenderName = messageData.quoted_username || chatT('unknown_user');
                 const quotedText = messageData.quoted_content;
                 const quotedType = messageData.quoted_type || 'text';
                 
                 quotedContent = `
                     <div class="quoted-message">
                         <div class="quoted-header">
-                            <span class="quoted-label">引用</span>
+                            <span class="quoted-label">${chatT('quote_label')}</span>
                             <span class="quoted-sender">${quotedSenderName}</span>
                         </div>
                         <div class="quoted-content">
@@ -2941,6 +2929,7 @@ $members = $chatModel->getGroupMembers($groupId);
             const messageElement = document.createElement('div');
             messageElement.className = `message ${isOwnMessage ? 'own' : ''}`;
             messageElement.setAttribute('data-message-id', messageData.id);
+            messageElement.setAttribute('data-msg-sig', getMessageSignature(messageData));
             messageElement.setAttribute('data-message-type', messageData.message_type);
             messageElement.setAttribute('data-sender-id', messageData.sender_id);
             messageElement.setAttribute('data-sender-name', messageData.username);
@@ -2950,7 +2939,7 @@ $members = $chatModel->getGroupMembers($groupId);
             messageElement.innerHTML = `
                 <div class="message-avatar">
                     ${messageData.avatar && messageData.avatar !== 'default_avatar.png' ? 
-                        `<img src="/CHATTING/public/uploads/avatars/${messageData.avatar}" alt="头像">` : 
+                        `<img src="/Chat_System/public/uploads/avatars/${messageData.avatar}" alt="头像">` : 
                         messageData.username.charAt(0).toUpperCase()}
                 </div>
                 <div class="message-content">
@@ -2961,82 +2950,9 @@ $members = $chatModel->getGroupMembers($groupId);
                 </div>
             `;
             
-            // 添加消息气泡栏
-            const bubbleBar = document.createElement('div');
-            bubbleBar.className = 'message-bubble-bar';
-            bubbleBar.id = `bubble-${messageData.id}`;
-            bubbleBar.setAttribute('onmouseenter', 'keepBubbleVisible(this)');
-            bubbleBar.setAttribute('onmouseleave', 'hideBubbleOnLeave(this)');
-            
-            // 生成气泡栏内容
-            let bubbleContent = '';
-            
-            if (isOwnMessage) {
-                // 撤回/删除按钮
-                bubbleContent += `
-                    <button class="bubble-btn" 
-                            onclick="${messageData.message_type === 'text' ? 'recallMessage' : 'deleteMessage'}(${messageData.id})"
-                            title="${messageData.message_type === 'text' ? '撤回消息' : '删除消息'}">
-                        ${messageData.message_type === 'text' ? '↩️' : '🗑️'}
-                        <div class="bubble-tooltip">${messageData.message_type === 'text' ? '撤回' : '删除'}</div>
-                    </button>
-                `;
-                
-                // 修改按钮（仅文本消息）
-                if (messageData.message_type === 'text' && !messageData.file_path) {
-                    bubbleContent += `
-                        <button class="bubble-btn" 
-                                onclick="editMessage(${messageData.id}, '${messageData.content.replace(/'/g, "\\'")}')"
-                                title="修改消息">
-                            ✏️
-                            <div class="bubble-tooltip">修改</div>
-                        </button>
-                    `;
-                }
+            if (window.currentUserId) {
+                attachMessageBubbleBar(messageElement, messageData, window.currentUserId);
             }
-            
-            // 收藏按钮
-            bubbleContent += `
-                <button class="bubble-btn" 
-                        onclick="toggleFavorite(${messageData.id})"
-                        title="收藏消息">
-                    ⭐
-                    <div class="bubble-tooltip">收藏</div>
-                </button>
-            `;
-            
-            // 置顶按钮
-            bubbleContent += `
-                <button class="bubble-btn" 
-                        onclick="togglePin(${messageData.id})"
-                        title="置顶消息">
-                    📌
-                    <div class="bubble-tooltip">置顶</div>
-                </button>
-            `;
-            
-            // 引用按钮
-            bubbleContent += `
-                <button class="bubble-btn" 
-                        onclick="quoteMessage(${messageData.id})"
-                        title="引用消息">
-                    💬
-                    <div class="bubble-tooltip">引用</div>
-                </button>
-            `;
-            
-            // 转发按钮
-            bubbleContent += `
-                <button class="bubble-btn" 
-                        onclick="forwardMessage(${messageData.id})"
-                        title="转发消息">
-                    📤
-                    <div class="bubble-tooltip">转发</div>
-                </button>
-            `;
-            
-            bubbleBar.innerHTML = bubbleContent;
-            messageElement.appendChild(bubbleBar);
             
             return messageElement;
         }
@@ -3218,7 +3134,7 @@ $members = $chatModel->getGroupMembers($groupId);
                 memberItem.innerHTML = `
                     <div class="mention-member-avatar">
                         ${member.avatar && member.avatar !== 'default_avatar.png' ? 
-                            `<img src="/CHATTING/public/uploads/avatars/${member.avatar}" alt="头像">` : 
+                            `<img src="/Chat_System/public/uploads/avatars/${member.avatar}" alt="头像">` : 
                             member.username.charAt(0).toUpperCase()}
                     </div>
                     <div class="mention-member-info">
@@ -3405,7 +3321,7 @@ $members = $chatModel->getGroupMembers($groupId);
                 body += `&quoted_message_id=${window.quotedMessageId}`;
             }
             
-            fetch('/CHATTING/chat/sendMessage', {
+            fetch('/Chat_System/chat/sendMessage', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -3439,12 +3355,11 @@ $members = $chatModel->getGroupMembers($groupId);
                         clearQuote();
                     }
                     
-                    showNotification('消息发送成功', 'success');
+                    showNotification(chatT('chat_send_message'), 'success');
                     
-                    // 动态添加新消息到消息列表
                     addNewMessageToChat(data.message);
+                    refreshMessagesArea(true);
                     
-                    // 滚动到底部
                     setTimeout(forceScrollToBottom, 100);
                 } else {
                     console.error('消息发送失败:', data.message);
@@ -3469,7 +3384,7 @@ $members = $chatModel->getGroupMembers($groupId);
             formData.append('file_type', currentFileType);
             formData.append('file_count', selectedFiles.length);
             
-            fetch('/CHATTING/chat/sendMultipleFiles', {
+            fetch('/Chat_System/chat/sendMultipleFiles', {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -3492,16 +3407,15 @@ $members = $chatModel->getGroupMembers($groupId);
             })
             .then(data => {
                 if (data.success) {
-                    showNotification('文件发送成功', 'success');
+                    showNotification(chatT('file_send_success'), 'success');
                     
-                    // 清空文件选择
-                    selectedFiles = [];
+                    removeFilePreview();
                     document.getElementById('message-input').value = '';
                     
-                    // 动态添加新消息到聊天列表
                     if (data.message) {
                         addNewMessageToChat(data.message);
                     }
+                    refreshMessagesArea(true);
                     
                     // 滚动到底部
                     setTimeout(forceScrollToBottom, 100);
@@ -3524,7 +3438,7 @@ $members = $chatModel->getGroupMembers($groupId);
             formData.append('room_id', roomId);
             
             // 发送语音消息
-            fetch('/CHATTING/chat/sendVoiceMessage', {
+            fetch('/Chat_System/chat/sendVoiceMessage', {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -3547,26 +3461,24 @@ $members = $chatModel->getGroupMembers($groupId);
             })
             .then(data => {
                 if (data.success) {
-                    showNotification('语音消息发送成功', 'success');
+                    showNotification(chatT('voice_send_success'), 'success');
                     
-                    // 移除预览
-                    recordedAudioBlob = null;
+                    removeVoicePreview();
                     document.getElementById('message-input').value = '';
                     
-                    // 动态添加新消息到聊天列表
                     if (data.message) {
                         addNewMessageToChat(data.message);
                     }
+                    refreshMessagesArea(true);
                     
-                    // 滚动到底部
                     setTimeout(forceScrollToBottom, 100);
                 } else {
-                    showNotification('语音消息发送失败: ' + data.message, 'error');
+                    showNotification(chatT('voice_send_failed') + ': ' + data.message, 'error');
                 }
             })
             .catch(error => {
                 console.error('语音消息发送失败:', error);
-                showNotification('语音消息发送失败: ' + error.message, 'error');
+                showNotification(chatT('voice_send_failed') + ': ' + error.message, 'error');
             });
         }
         
@@ -3626,7 +3538,7 @@ $members = $chatModel->getGroupMembers($groupId);
                 console.log('群组通话参数:', { callId, roomId, callType, fromUserId, fromUsername });
                 
                 // 发送群组通话邀请
-                const response = await fetch('/CHATTING/call/sendGroupCallInvitation', {
+                const response = await fetch('/Chat_System/call/sendGroupCallInvitation', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -3649,7 +3561,7 @@ $members = $chatModel->getGroupMembers($groupId);
                     showNotification('正在呼叫群组成员...', 'success');
                     
                     // 跳转到视频通话页面
-                    const videoCallUrl = `/CHATTING/chat/videoCall?roomId=${roomId}&callType=${callType}&fromUserId=${fromUserId}&fromUsername=${encodeURIComponent(fromUsername)}&isIncoming=false&callId=${callId}&isGroup=true`;
+                    const videoCallUrl = `/Chat_System/chat/videoCall?roomId=${roomId}&callType=${callType}&fromUserId=${fromUserId}&fromUsername=${encodeURIComponent(fromUsername)}&isIncoming=false&callId=${callId}&isGroup=true`;
                     window.location.href = videoCallUrl;
                 } else {
                     throw new Error(result.message || '发送群组通话邀请失败');
@@ -3676,7 +3588,7 @@ $members = $chatModel->getGroupMembers($groupId);
                 console.log('群组通话参数:', { callId, roomId, callType, fromUserId, fromUsername });
                 
                 // 发送群组通话邀请
-                const response = await fetch('/CHATTING/call/sendGroupCallInvitation', {
+                const response = await fetch('/Chat_System/call/sendGroupCallInvitation', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -3699,7 +3611,7 @@ $members = $chatModel->getGroupMembers($groupId);
                     showNotification('正在呼叫群组成员...', 'success');
                     
                     // 跳转到视频通话页面
-                    const videoCallUrl = `/CHATTING/chat/videoCall?roomId=${roomId}&callType=${callType}&fromUserId=${fromUserId}&fromUsername=${encodeURIComponent(fromUsername)}&isIncoming=false&callId=${callId}&isGroup=true`;
+                    const videoCallUrl = `/Chat_System/chat/videoCall?roomId=${roomId}&callType=${callType}&fromUserId=${fromUserId}&fromUsername=${encodeURIComponent(fromUsername)}&isIncoming=false&callId=${callId}&isGroup=true`;
                     window.location.href = videoCallUrl;
                 } else {
                     throw new Error(result.message || '发送群组通话邀请失败');
@@ -3714,7 +3626,7 @@ $members = $chatModel->getGroupMembers($groupId);
         // 打开群组设置页面
         function openGroupSettings() {
             const groupId = <?php echo $group['id']; ?>;
-            window.location.href = `/CHATTING/chat/groupSettings?id=${groupId}`;
+            window.location.href = `/Chat_System/chat/groupSettings?id=${groupId}`;
         }
         
         // 调试函数 - 检查按钮是否存在
@@ -3775,6 +3687,17 @@ $members = $chatModel->getGroupMembers($groupId);
                 forceScrollToBottom();
             }, 200);
         });
+        
+        function refreshMessagesArea(forceScroll) {
+            syncRoomMessages(<?php echo $group['id']; ?>, createMessageElement, { forceScroll: !!forceScroll });
+        }
+        
+        // 每 1 秒同步消息（新消息、撤回等状态变更）
+        setInterval(function() { refreshMessagesArea(false); }, 1000);
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) refreshMessagesArea(false);
+        });
+        window.addEventListener('focus', function() { refreshMessagesArea(false); });
         
         // 页面完全加载后再次确保滚动到底部
         window.addEventListener('load', function() {

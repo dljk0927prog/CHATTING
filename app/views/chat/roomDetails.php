@@ -15,7 +15,7 @@ $lang = Language::getInstance();
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo str_replace('{name}', htmlspecialchars($roomInfo['display_name']), __('room_details_title')); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         * {
             margin: 0;
@@ -993,7 +993,7 @@ $lang = Language::getInstance();
 <body>
     <div class="room-details-container">
         <!-- 返回按钮 -->
-        <a href="/CHATTING/dashboard" class="back-btn" title="<?php echo __('room_details_back_dashboard'); ?>"></a>
+        <a href="/Chat_System/dashboard" class="back-btn" title="<?php echo __('room_details_back_dashboard'); ?>"></a>
         
         <!-- 房间头部信息 -->
         <div class="header-section">
@@ -1007,7 +1007,7 @@ $lang = Language::getInstance();
                             $roomAvatar !== 'default_avatar.png' && 
                             $roomAvatar !== 'group_avatar.png' && 
                             file_exists($avatarPath)) {
-                            echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($roomAvatar) . '" alt="' . __('room_details_avatar_alt') . '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">';
+                            echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($roomAvatar) . '" alt="' . __('room_details_avatar_alt') . '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">';
                             echo '<div style="display:none; width:100%; height:100%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; align-items:center; justify-content:center; font-size:2rem; font-weight:bold; border-radius:50%;">' . strtoupper(substr($roomInfo['display_name'], 0, 1)) . '</div>';
                         } else {
                             echo '<div style="width:100%; height:100%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:bold; border-radius:50%;">' . strtoupper(substr($roomInfo['display_name'], 0, 1)) . '</div>';
@@ -1067,7 +1067,7 @@ $lang = Language::getInstance();
                                 if (!empty($memberAvatar) && 
                                     $memberAvatar !== 'default_avatar.png' && 
                                     file_exists($memberAvatarPath)) {
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($memberAvatar) . '" alt="' . __('room_details_avatar_alt') . '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($memberAvatar) . '" alt="' . __('room_details_avatar_alt') . '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">';
                                     echo '<div style="display:none; width:100%; height:100%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; align-items:center; justify-content:center; font-size:1rem; font-weight:bold; border-radius:50%;">' . strtoupper(substr($member['username'], 0, 1)) . '</div>';
                                 } else {
                                     echo '<div style="width:100%; height:100%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; display:flex; align-items:center; justify-content:center; font-size:1rem; font-weight:bold; border-radius:50%;">' . strtoupper(substr($member['username'], 0, 1)) . '</div>';
@@ -1176,7 +1176,7 @@ $lang = Language::getInstance();
         // 删除好友功能
         function deleteFriend(roomId) {
             if (confirm('<?php echo __('room_details_confirm_delete_friend'); ?>')) {
-                fetch('/CHATTING/chat/deleteFriend', {
+                fetch('/Chat_System/chat/deleteFriend', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1189,7 +1189,7 @@ $lang = Language::getInstance();
                     if (data.success) {
                         alert('<?php echo __('room_details_friend_deleted'); ?>');
                         // 跳转回仪表板
-                        window.location.href = '/CHATTING/dashboard';
+                        window.location.href = '/Chat_System/dashboard';
                     } else {
                         alert('<?php echo __('room_details_delete_failed'); ?>: ' + data.message);
                     }
@@ -1216,10 +1216,10 @@ $lang = Language::getInstance();
                 button.disabled = true;
                 
                 console.log('Sending request to clear history...');
-                console.log('Request URL:', '/CHATTING/chat/clearHistory');
+                console.log('Request URL:', '/Chat_System/chat/clearHistory');
                 console.log('Request data:', { room_id: roomId, room_type: roomType });
                 
-                fetch('/CHATTING/chat/clearHistory', {
+                fetch('/Chat_System/chat/clearHistory', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1240,9 +1240,9 @@ $lang = Language::getInstance();
                         alert('<?php echo __('room_details_history_cleared'); ?>');
                         // 跳转回聊天页面
                         if (roomType === 'group') {
-                            window.location.href = `/CHATTING/chat/group?id=${roomId}`;
+                            window.location.href = `/Chat_System/chat/group?id=${roomId}`;
                         } else {
-                            window.location.href = `/CHATTING/chat/room?id=${roomId}`;
+                            window.location.href = `/Chat_System/chat/room?id=${roomId}`;
                         }
                     } else {
                         console.error('Clear history failed:', data.message);
@@ -1267,7 +1267,7 @@ $lang = Language::getInstance();
         // 封锁好友功能
         function blockFriend(roomId) {
             if (confirm('<?php echo __('room_details_confirm_block_friend'); ?>')) {
-                fetch('/CHATTING/chat/blockFriend', {
+                fetch('/Chat_System/chat/blockFriend', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1280,7 +1280,7 @@ $lang = Language::getInstance();
                     if (data.success) {
                         alert('<?php echo __('room_details_friend_blocked'); ?>');
                         // 跳转回仪表板
-                        window.location.href = '/CHATTING/dashboard';
+                        window.location.href = '/Chat_System/dashboard';
                     } else {
                         alert('<?php echo __('room_details_block_failed'); ?>: ' + data.message);
                     }
@@ -1333,7 +1333,7 @@ $lang = Language::getInstance();
             saveBtn.textContent = '<?php echo __('room_details_saving'); ?>';
             saveBtn.disabled = true;
             
-            fetch('/CHATTING/chat/setFriendNickname', {
+            fetch('/Chat_System/chat/setFriendNickname', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -1373,5 +1373,6 @@ $lang = Language::getInstance();
             }
         });
     </script>
+    <?php $footerVariant = 'default'; include BASE_PATH . '/app/views/components/site-footer.php'; ?>
 </body>
 </html>

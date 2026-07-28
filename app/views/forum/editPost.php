@@ -15,7 +15,7 @@ $lang = Language::getInstance();
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo str_replace('{forum_name}', htmlspecialchars($post['forum_name']), __('post_edit_title')); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         .edit-container {
             height: 100%;
@@ -681,7 +681,7 @@ $lang = Language::getInstance();
                             <div class="existing-attachments">
                                 <?php foreach ($post['media_files'] as $media): ?>
                                     <?php 
-                                    $filePath = '/CHATTING/public/uploads/files/' . $media['filename'];
+                                    $filePath = '/Chat_System/public/uploads/files/' . $media['filename'];
                                     $isImage = in_array($media['file_type'], ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
                                     $isVideo = in_array($media['file_type'], ['video/mp4', 'video/webm', 'video/quicktime']);
                                     ?>
@@ -750,7 +750,7 @@ $lang = Language::getInstance();
                         <?php endif; ?>
                         
                         <div class="form-actions">
-                            <a href="/CHATTING/forum/post?id=<?php echo $post['id']; ?>" class="btn btn-secondary">
+                            <a href="/Chat_System/forum/post?id=<?php echo $post['id']; ?>" class="btn btn-secondary">
                                 ← 取消编辑
                             </a>
                             <div class="form-action-buttons">
@@ -882,7 +882,7 @@ $lang = Language::getInstance();
                 }
             }
             
-            fetch('/CHATTING/forum/editPost', {
+            fetch('/Chat_System/forum/editPost', {
                 method: 'POST',
                 body: formData
             })
@@ -892,7 +892,7 @@ $lang = Language::getInstance();
                 if (data.success) {
                     showSuccess('帖子修改成功！');
                     setTimeout(() => {
-                        window.location.href = '/CHATTING/forum/post?id=' + postId;
+                        window.location.href = '/Chat_System/forum/post?id=' + postId;
                     }, 1500);
                 } else {
                     showError('修改失败: ' + data.message);
@@ -911,7 +911,7 @@ $lang = Language::getInstance();
                 const formData = new FormData();
                 formData.append('post_id', postId);
                 
-                fetch('/CHATTING/forum/deletePost', {
+                fetch('/Chat_System/forum/deletePost', {
                     method: 'POST',
                     body: formData
                 })
@@ -919,7 +919,7 @@ $lang = Language::getInstance();
                 .then(data => {
                     if (data.success) {
                         alert('帖子删除成功！');
-                        window.location.href = '/CHATTING/forum/view?id=<?php echo $post['forum_id']; ?>';
+                        window.location.href = '/Chat_System/forum/view?id=<?php echo $post['forum_id']; ?>';
                     } else {
                         alert('删除失败: ' + data.message);
                     }
@@ -974,7 +974,7 @@ $lang = Language::getInstance();
                 const formData = new FormData();
                 formData.append('file_id', fileId);
                 
-                fetch('/CHATTING/forum/removeAttachment', {
+                fetch('/Chat_System/forum/removeAttachment', {
                     method: 'POST',
                     body: formData
                 })

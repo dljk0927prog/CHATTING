@@ -349,7 +349,7 @@ class CallInvitationController {
      */
     private function sendToSignalingServer($data) {
         try {
-            $url = 'http://localhost/CHATTING/signaling-server.php';
+            $url = 'http://localhost/Chat_System/signaling-server.php';
             
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);

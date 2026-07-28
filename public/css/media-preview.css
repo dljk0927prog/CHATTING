@@ -1,0 +1,170 @@
+/* 图片/视频预览模态框 */
+.image-preview-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.image-preview-modal.hidden {
+    display: none;
+}
+
+.image-preview-modal .modal-content {
+    background: #1a1a1a;
+    border-radius: 12px;
+    max-width: 92%;
+    max-height: 92%;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.image-preview-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-preview-modal .modal-header h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.image-preview-modal .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #aaa;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
+
+.image-preview-modal .close-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.image-preview-modal .modal-body {
+    padding: 16px;
+}
+
+.image-preview-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.image-preview-main {
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-main-image,
+.preview-main-video {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+.image-preview-thumbnails {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-top: 4px;
+}
+
+.image-preview-thumbnails:empty {
+    display: none;
+}
+
+.thumbnail-item {
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s ease;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.thumbnail-item:hover,
+.thumbnail-item.active {
+    border-color: #667eea;
+}
+
+.thumbnail-item .thumbnail-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnail-play-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* 视频消息放大按钮 */
+.media-preview-wrap {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.media-expand-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+}
+
+.media-preview-wrap:hover .media-expand-btn,
+.media-expand-btn:focus {
+    opacity: 1;
+}
+
+.collage-item {
+    cursor: pointer;
+}

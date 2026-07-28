@@ -15,7 +15,7 @@ $lang = Language::getInstance();
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo __('blocked_list_title'); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
     <style>
         * {
             margin: 0;
@@ -543,7 +543,7 @@ $lang = Language::getInstance();
 <body>
     <div class="blocked-list-container">
         <!-- 返回按钮 -->
-        <a href="/CHATTING/dashboard" class="back-btn" title="<?php echo __('blocked_list_back_dashboard'); ?>"></a>
+        <a href="/Chat_System/dashboard" class="back-btn" title="<?php echo __('blocked_list_back_dashboard'); ?>"></a>
         
         <!-- 页面头部信息 -->
         <div class="header-section">
@@ -576,7 +576,7 @@ $lang = Language::getInstance();
                                 } else {
                                     $avatarPath = BASE_PATH . '/public/uploads/avatars/' . $avatarValue;
                                     if (file_exists($avatarPath)) {
-                                        echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($avatarValue) . '" alt="' . __('blocked_avatar_alt') . '">';
+                                        echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($avatarValue) . '" alt="' . __('blocked_avatar_alt') . '">';
                                     } else {
                                         echo strtoupper(substr($blockedUser['username'], 0, 1));
                                     }
@@ -612,7 +612,7 @@ $lang = Language::getInstance();
         // 解除封锁功能
         function unblockUser(blockedId) {
             if (confirm('确定要解除对这个用户的封锁吗？')) {
-                fetch('/CHATTING/chat/unblockFriend', {
+                fetch('/Chat_System/chat/unblockFriend', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -636,5 +636,6 @@ $lang = Language::getInstance();
             }
         }
     </script>
+    <?php $footerVariant = 'default'; include BASE_PATH . '/app/views/components/site-footer.php'; ?>
 </body>
 </html>

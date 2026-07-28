@@ -8,13 +8,13 @@ $chatModel = new Chat();
 // 获取当前聊天室信息
 $roomId = $_GET['id'] ?? null;
 if (!$roomId) {
-    header("Location: /CHATTING/dashboard");
+    header("Location: /Chat_System/dashboard");
     exit;
 }
 
 $room = $chatModel->getRoomInfo($roomId, $_SESSION['user_id']);
 if (!$room) {
-    header("Location: /CHATTING/dashboard");
+    header("Location: /Chat_System/dashboard");
     exit;
 }
 
@@ -22,7 +22,7 @@ if (!$room) {
 
 // 检查房间类型，如果是群组，重定向到群组页面
 if ($room['type'] === 'group') {
-    header("Location: /CHATTING/chat/group?id=" . $roomId);
+    header("Location: /Chat_System/chat/group?id=" . $roomId);
     exit;
 }
 
@@ -56,7 +56,9 @@ $lang = Language::getInstance();
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?php echo str_replace('{name}', htmlspecialchars($room['display_name']), __('chat_page_title')); ?></title>
-    <link rel="stylesheet" href="/CHATTING/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/style.css">
+    <link rel="stylesheet" href="/Chat_System/public/css/message-bubble-bar.css?v=1">
+    <link rel="stylesheet" href="/Chat_System/public/css/media-preview.css?v=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* 聊天头部样式 */
@@ -1140,7 +1142,7 @@ $lang = Language::getInstance();
                             $roomAvatar = $room['avatar'] ?? null;
                             
                             if (!empty($roomAvatar) && file_exists(BASE_PATH . '/public/uploads/avatars/' . $roomAvatar)) {
-                                echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($roomAvatar) . '" alt="' . __('avatar_default') . '">';
+                                echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($roomAvatar) . '" alt="' . __('avatar_default') . '">';
                             } else {
                                 echo strtoupper(substr($room['display_name'], 0, 1));
                             }
@@ -1180,7 +1182,7 @@ $lang = Language::getInstance();
                         </div>
                         
                         <!-- Menu按钮 -->
-                        <a href="/CHATTING/chat/roomDetails?id=<?php echo $room['id']; ?>" class="menu-btn" title="<?php echo __('menu'); ?>" style="width: 40px !important; height: 40px !important; border-radius: 50% !important; border: none !important; background: #f8f9fa !important; color: #6c757d !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 16px !important; transition: all 0.3s ease !important; text-decoration: none !important;">
+                        <a href="/Chat_System/chat/roomDetails?id=<?php echo $room['id']; ?>" class="menu-btn" title="<?php echo __('menu'); ?>" style="width: 40px !important; height: 40px !important; border-radius: 50% !important; border: none !important; background: #f8f9fa !important; color: #6c757d !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 16px !important; transition: all 0.3s ease !important; text-decoration: none !important;">
                             <i class="fas fa-ellipsis-v"></i>
                         </a>
                     </div>
@@ -1207,7 +1209,7 @@ $lang = Language::getInstance();
                                 <?php 
                                 $messageAvatar = $message['avatar'] ?? null;
                                 if (!empty($messageAvatar) && $messageAvatar !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $messageAvatar)) {
-                                    echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($messageAvatar) . '" alt="' . __('message_avatar_alt') . '">';
+                                    echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($messageAvatar) . '" alt="' . __('message_avatar_alt') . '">';
                                 } else {
                                     echo strtoupper(substr($message['username'], 0, 1));
                                 }
@@ -1217,7 +1219,7 @@ $lang = Language::getInstance();
                                 <?php if (!empty($message['quoted_content'])): ?>
                                     <div class="quoted-message">
                                         <div class="quoted-header">
-                                            <span class="quoted-label">引用</span>
+                                            <span class="quoted-label"><?php echo __('quote_label'); ?></span>
                                             <span class="quoted-sender"><?php echo htmlspecialchars($message['quoted_username']); ?></span>
                                         </div>
                                         <div class="quoted-content">
@@ -1236,7 +1238,7 @@ $lang = Language::getInstance();
                                 ?>
                                     <div class="recalled-message">
                                         <span class="recall-icon">↩️</span>
-                                        <span class="recall-text">[撤回消息]</span>
+                                        <span class="recall-text">${chatT('message_recalled_label')}</span>
                                     </div>
                                 <?php 
                                 elseif ($message['message_type'] === 'voice'): 
@@ -1244,17 +1246,17 @@ $lang = Language::getInstance();
                                 ?>
                                     <div class="voice-message">
                                         <audio controls class="voice-player">
-                                            <source src="/CHATTING/<?php echo htmlspecialchars($message['file_path']); ?>" type="audio/webm">
-                                            您的浏览器不支持音频播放。
+                                            <source src="/Chat_System/<?php echo htmlspecialchars($message['file_path']); ?>" type="audio/webm">
+                                            <?php echo __('audio_not_supported'); ?>
                                         </audio>
-                                        <div class="voice-duration">语音消息</div>
+                                        <div class="voice-duration"><?php echo __('voice_message'); ?></div>
                                     </div>
                                 <?php 
                                 elseif (!empty($message['file_path']) && !empty($message['is_recalled'])): 
                                 ?>
                                     <div class="recalled-message">
                                         <span class="recall-icon">↩️</span>
-                                        <span class="recall-text">[撤回消息]</span>
+                                        <span class="recall-text">${chatT('message_recalled_label')}</span>
                                     </div>
                                 <?php 
                                 elseif (!empty($message['file_path'])): 
@@ -1294,14 +1296,11 @@ $lang = Language::getInstance();
                                                         <div class="file-details">
                                                             <div class="file-name"><?php echo htmlspecialchars($fileName); ?></div>
                                                             <?php if ($fileExtension): ?>
-                                                                <div class="file-type"><?php echo strtoupper($fileExtension); ?> 文件</div>
+                                                                <div class="file-type"><?php echo str_replace('{ext}', strtoupper($fileExtension), __('file_type_with_ext')); ?></div>
                                                             <?php endif; ?>
                                                         </div>
-                                                        <a href="<?php echo htmlspecialchars($fileUrl); ?>" download class="download-btn">下载</a>
+                                                        <a href="<?php echo htmlspecialchars($fileUrl); ?>" download class="download-btn"><?php echo __('download'); ?></a>
                                                     </div>
-                                                <?php endif; ?>
-                                                <?php if (!in_array($fileExtension, ['zip', 'rar', '7z', 'tar', 'gz', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'])): ?>
-                                                    <div class="file-name"><?php echo htmlspecialchars($message['content']); ?></div>
                                                 <?php endif; ?>
                                             </div>
                                         <?php } else {
@@ -1350,7 +1349,7 @@ $lang = Language::getInstance();
                                                     }
                                                     ?>
                                                 </div>
-                                                <div class="files-info"><?php echo $fileCount; ?> 个文件</div>
+                                                <div class="files-info"><?php echo str_replace('{count}', $fileCount, __('message_files_count')); ?></div>
                                             </div>
                                         <?php }
                                     } else {
@@ -1386,7 +1385,7 @@ $lang = Language::getInstance();
                                                 <div class="document-message">
                                                     <div class="file-icon">📄</div>
                                                     <div class="file-details">
-                                                        <div class="file-name"><?php echo htmlspecialchars($fileName ?: '文件'); ?></div>
+                                                        <div class="file-name"><?php echo htmlspecialchars($fileName ?: __('file')); ?></div>
                                                         <?php if ($fileExtension): ?>
                                                             <div class="file-type"><?php echo strtoupper($fileExtension); ?> 文件</div>
                                                         <?php endif; ?>
@@ -1394,7 +1393,6 @@ $lang = Language::getInstance();
                                                     <a href="<?php echo htmlspecialchars($fileUrl); ?>" download class="download-btn">下载</a>
                                                 </div>
                                             <?php endif; ?>
-                                            <div class="file-name"><?php echo htmlspecialchars($message['content']); ?></div>
                                         </div>
                                     <?php } ?>
                                 <?php 
@@ -1402,7 +1400,7 @@ $lang = Language::getInstance();
                                 ?>
                                     <div class="recalled-message">
                                         <span class="recall-icon">↩️</span>
-                                        <span class="recall-text">[撤回消息]</span>
+                                        <span class="recall-text">${chatT('message_recalled_label')}</span>
                                     </div>
                                 <?php 
                                 else: 
@@ -1459,7 +1457,7 @@ $lang = Language::getInstance();
                                     <?php 
                                     $messageAvatar = $message['avatar'] ?? null;
                                     if (!empty($messageAvatar) && $messageAvatar !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $messageAvatar)) {
-                                        echo '<img src="/CHATTING/public/uploads/avatars/' . htmlspecialchars($messageAvatar) . '" alt="' . __('message_avatar_alt') . '">';
+                                        echo '<img src="/Chat_System/public/uploads/avatars/' . htmlspecialchars($messageAvatar) . '" alt="' . __('message_avatar_alt') . '">';
                                     } else {
                                         echo strtoupper(substr($message['username'], 0, 1));
                                     }
@@ -1472,7 +1470,7 @@ $lang = Language::getInstance();
                                     ?>
                                         <div class="recalled-message">
                                             <span class="recall-icon">↩️</span>
-                                            <span class="recall-text">[撤回消息]</span>
+                                            <span class="recall-text">${chatT('message_recalled_label')}</span>
                                         </div>
                                     <?php 
                                     elseif ($message['message_type'] === 'voice'): 
@@ -1480,17 +1478,17 @@ $lang = Language::getInstance();
                                     ?>
                                         <div class="voice-message">
                                         <audio controls class="voice-player">
-                                            <source src="/CHATTING/<?php echo htmlspecialchars($message['file_path']); ?>" type="audio/webm">
-                                            您的浏览器不支持音频播放。
+                                            <source src="/Chat_System/<?php echo htmlspecialchars($message['file_path']); ?>" type="audio/webm">
+                                            <?php echo __('audio_not_supported'); ?>
                                         </audio>
-                                            <div class="voice-duration">语音消息</div>
+                                            <div class="voice-duration"><?php echo __('voice_message'); ?></div>
                                         </div>
                                     <?php 
                                     elseif (!empty($message['file_path']) && !empty($message['is_recalled'])): 
                                     ?>
                                         <div class="recalled-message">
                                             <span class="recall-icon">↩️</span>
-                                            <span class="recall-text">[撤回消息]</span>
+                                            <span class="recall-text">${chatT('message_recalled_label')}</span>
                                         </div>
                                     <?php 
                                     elseif (!empty($message['file_path'])): 
@@ -1519,7 +1517,7 @@ $lang = Language::getInstance();
                                                 ?>">
                                                     <?php 
                                                     // 检查文件是否存在
-                                                    $actualFilePath = str_replace('/CHATTING/public/uploads/', BASE_PATH . '/public/uploads/', $fileUrl);
+                                                    $actualFilePath = str_replace('/Chat_System/public/uploads/', BASE_PATH . '/public/uploads/', $fileUrl);
                                                     $fileExists = file_exists($actualFilePath);
                                                     ?>
                                                     <?php if (!$fileExists): ?>
@@ -1529,7 +1527,7 @@ $lang = Language::getInstance();
                                                                 <div class="file-icon">📁</div>
                                                                 <div class="file-details">
                                                                     <div class="file-name">文件已删除或不存在</div>
-                                                                    <div class="file-type"><?php echo strtoupper($fileExtension); ?> 文件</div>
+                                                                    <div class="file-type"><?php echo str_replace('{ext}', strtoupper($fileExtension), __('file_type_with_ext')); ?></div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1546,14 +1544,11 @@ $lang = Language::getInstance();
                                                             <div class="file-details">
                                                                 <div class="file-name"><?php echo htmlspecialchars($fileName); ?></div>
                                                                 <?php if ($fileExtension): ?>
-                                                                    <div class="file-type"><?php echo strtoupper($fileExtension); ?> 文件</div>
+                                                                    <div class="file-type"><?php echo str_replace('{ext}', strtoupper($fileExtension), __('file_type_with_ext')); ?></div>
                                                                 <?php endif; ?>
                                                             </div>
-                                                            <a href="<?php echo htmlspecialchars($fileUrl); ?>" download class="download-btn">下载</a>
+                                                            <a href="<?php echo htmlspecialchars($fileUrl); ?>" download class="download-btn"><?php echo __('download'); ?></a>
                                                         </div>
-                                                    <?php endif; ?>
-                                                    <?php if (!in_array($fileExtension, ['zip', 'rar', '7z', 'tar', 'gz', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'])): ?>
-                                                        <div class="file-name"><?php echo htmlspecialchars($message['content']); ?></div>
                                                     <?php endif; ?>
                                                 </div>
                                             <?php } else {
@@ -1602,7 +1597,7 @@ $lang = Language::getInstance();
                                                         }
                                                         ?>
                                                     </div>
-                                                    <div class="files-info"><?php echo $fileCount; ?> 个文件</div>
+                                                    <div class="files-info"><?php echo str_replace('{count}', $fileCount, __('message_files_count')); ?></div>
                                                 </div>
                                             <?php }
                                         } else {
@@ -1638,15 +1633,14 @@ $lang = Language::getInstance();
                                                     <div class="document-message">
                                                         <div class="file-icon">📄</div>
                                                         <div class="file-details">
-                                                            <div class="file-name"><?php echo htmlspecialchars($fileName ?: '文件'); ?></div>
+                                                            <div class="file-name"><?php echo htmlspecialchars($fileName ?: __('file')); ?></div>
                                                             <?php if ($fileExtension): ?>
-                                                                <div class="file-type"><?php echo strtoupper($fileExtension); ?> 文件</div>
+                                                                <div class="file-type"><?php echo str_replace('{ext}', strtoupper($fileExtension), __('file_type_with_ext')); ?></div>
                                                             <?php endif; ?>
                                                         </div>
-                                                        <a href="<?php echo htmlspecialchars($fileUrl); ?>" download class="download-btn">下载</a>
+                                                        <a href="<?php echo htmlspecialchars($fileUrl); ?>" download class="download-btn"><?php echo __('download'); ?></a>
                                                     </div>
                                                 <?php endif; ?>
-                                                <div class="file-name"><?php echo htmlspecialchars($message['content']); ?></div>
                                             </div>
                                         <?php } ?>
                                     <?php 
@@ -1654,7 +1648,7 @@ $lang = Language::getInstance();
                                     ?>
                                         <div class="recalled-message">
                                             <span class="recall-icon">↩️</span>
-                                            <span class="recall-text">[撤回消息]</span>
+                                            <span class="recall-text">${chatT('message_recalled_label')}</span>
                                         </div>
                                     <?php 
                                     else: 
@@ -1700,7 +1694,7 @@ $lang = Language::getInstance();
                 <div class="quote-container hidden" id="quoteContainer">
                     <div class="quote-content">
                         <div class="quote-header">
-                            <span class="quote-label">引用消息</span>
+                            <span class="quote-label"><?php echo __('quote_message'); ?></span>
                             <button class="quote-close" onclick="clearQuote()">×</button>
                         </div>
                         <div class="quote-message" id="quoteMessageContent">
@@ -1729,7 +1723,7 @@ $lang = Language::getInstance();
                     <!-- 文件预览区域 -->
                     <div class="file-preview-area hidden" id="filePreviewArea">
                         <div class="preview-header">
-                            <span class="preview-title">文件预览</span>
+                            <span class="preview-title"><?php echo __('file_preview'); ?></span>
                             <button class="remove-preview-btn" onclick="removeFilePreview()">×</button>
                         </div>
                         <div class="preview-content" id="previewContent"></div>
@@ -1742,7 +1736,7 @@ $lang = Language::getInstance();
                     <!-- 语音预览区域 -->
                     <div class="voice-preview-area hidden" id="voicePreviewArea">
                         <div class="preview-header">
-                            <span class="preview-title">语音预览</span>
+                            <span class="preview-title"><?php echo __('voice_preview'); ?></span>
                             <button class="remove-preview-btn" onclick="removeVoicePreview()">×</button>
                         </div>
                         <div class="voice-preview-content" id="voicePreviewContent">
@@ -1781,7 +1775,7 @@ $lang = Language::getInstance();
     <div class="image-preview-modal hidden" id="imagePreviewModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>图片预览</h3>
+                <h3><?php echo __('image_preview_title'); ?></h3>
                 <button class="close-btn" onclick="hideImagePreview()">&times;</button>
             </div>
             <div class="modal-body">
@@ -1824,14 +1818,18 @@ $lang = Language::getInstance();
         </div>
     </div>
     
-    <!-- 聊天通用功能 -->
-    <script src="/CHATTING/public/js/chat-common.js?v=2025012723"></script>
+    <!-- 聊天 i18n + 通用功能 -->
+    <?php include BASE_PATH . '/app/views/components/chat-i18n.php'; ?>
+    <script src="/Chat_System/public/js/chat-common.js?v=2025012728"></script>
     
     <!-- 提供好友和群组数据给JavaScript -->
     <script>
         // 将PHP数据传递给JavaScript
         window.friendsData = <?php echo json_encode($friends); ?>;
         window.groupsData = <?php echo json_encode($groups); ?>;
+        
+        window.currentUserId = <?php echo (int)$_SESSION['user_id']; ?>;
+        window.currentRoomId = <?php echo $room['id']; ?>;
         
         // 当前聊天信息
         window.currentChat = {
@@ -1878,7 +1876,7 @@ $lang = Language::getInstance();
         // 打开房间详情页面 - 直接定义在全局作用域
         window.openRoomDetails = function() {
             const roomId = <?php echo $room['id']; ?>;
-            window.location.href = `/CHATTING/chat/roomDetails?id=${roomId}`;
+            window.location.href = `/Chat_System/chat/roomDetails?id=${roomId}`;
         };
         // 暴露其他函数到全局作用域
         window.startVoiceCall = startVoiceCall;
@@ -1897,7 +1895,7 @@ $lang = Language::getInstance();
                 const fromUsername = '<?php echo htmlspecialchars($user['username']); ?>';
                 
                 // 发送通话邀请
-                const response = await fetch('/CHATTING/call/sendCallInvitation', {
+                const response = await fetch('/Chat_System/call/sendCallInvitation', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1919,7 +1917,7 @@ $lang = Language::getInstance();
                     showNotification('正在呼叫对方...', 'success');
                     
                     // 跳转到视频通话页面
-                    const videoCallUrl = `/CHATTING/chat/videoCall?roomId=${roomId}&callType=${callType}&fromUserId=${fromUserId}&fromUsername=${encodeURIComponent(fromUsername)}&isIncoming=false&callId=${callId}`;
+                    const videoCallUrl = `/Chat_System/chat/videoCall?roomId=${roomId}&callType=${callType}&fromUserId=${fromUserId}&fromUsername=${encodeURIComponent(fromUsername)}&isIncoming=false&callId=${callId}`;
                     window.location.href = videoCallUrl;
                 } else {
                     throw new Error(result.message || '发送通话邀请失败');
@@ -1944,7 +1942,7 @@ $lang = Language::getInstance();
                 const fromUsername = '<?php echo htmlspecialchars($user['username']); ?>';
                 
                 // 发送通话邀请
-                const response = await fetch('/CHATTING/call/sendCallInvitation', {
+                const response = await fetch('/Chat_System/call/sendCallInvitation', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1966,7 +1964,7 @@ $lang = Language::getInstance();
                     showNotification('正在呼叫对方...', 'success');
                     
                     // 跳转到视频通话页面
-                    const videoCallUrl = `/CHATTING/chat/videoCall?roomId=${roomId}&callType=${callType}&fromUserId=${fromUserId}&fromUsername=${encodeURIComponent(fromUsername)}&isIncoming=false&callId=${callId}`;
+                    const videoCallUrl = `/Chat_System/chat/videoCall?roomId=${roomId}&callType=${callType}&fromUserId=${fromUserId}&fromUsername=${encodeURIComponent(fromUsername)}&isIncoming=false&callId=${callId}`;
                     window.location.href = videoCallUrl;
                 } else {
                     throw new Error(result.message || '发送通话邀请失败');
@@ -2117,19 +2115,19 @@ $lang = Language::getInstance();
             const recalledMessage = messageElement.querySelector('.recalled-message');
             
             if (recalledMessage) {
-                messageType = '[撤回消息]';
-                messageContent = '此消息已被撤回';
+                messageType = chatT('message_recalled_label');
+                messageContent = chatT('message_recalled_desc');
             } else if (voiceMessage) {
-                messageType = '[语音消息]';
-                messageContent = '语音消息';
+                messageType = chatT('voice_message');
+                messageContent = chatT('voice_message');
             } else if (fileMessage) {
                 const fileInfo = messageElement.querySelector('.files-info');
                 if (fileInfo) {
                     messageType = `[${fileInfo.textContent}]`;
                 } else {
-                    messageType = '[文件]';
+                    messageType = chatT('file');
                 }
-                messageContent = '文件消息';
+                messageContent = chatT('file_message_text');
             }
             
             // 设置引用的消息ID
@@ -2245,7 +2243,7 @@ $lang = Language::getInstance();
                     const messageId = parentMessage.getAttribute('data-message-id');
                     if (messageId) {
                         // 从数据库获取引用关系
-                        fetch(`/CHATTING/chat/getQuotedMessageId?message_id=${messageId}`)
+                        fetch(`/Chat_System/chat/getQuotedMessageId?message_id=${messageId}`)
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success && data.quoted_message_id) {
@@ -2268,6 +2266,7 @@ $lang = Language::getInstance();
                 }
             });
         }
+        window.addQuoteClickHandlers = addQuoteClickHandlers;
         
         
         // 发送文本消息（支持引用）
@@ -2278,7 +2277,7 @@ $lang = Language::getInstance();
                 body += `&quoted_message_id=${window.quotedMessageId}`;
             }
             
-            fetch('/CHATTING/chat/sendMessage', {
+            fetch('/Chat_System/chat/sendMessage', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -2302,7 +2301,7 @@ $lang = Language::getInstance();
             })
             .then(data => {
                 if (data.success) {
-                    // 发送成功后清空输入框并刷新消息区域
+                    // 发送成功后清空输入框
                     document.getElementById('message-input').value = '';
                     
                     // 清除引用状态
@@ -2310,17 +2309,12 @@ $lang = Language::getInstance();
                         clearQuote();
                     }
                     
-                    // 刷新消息区域
-                    if (typeof refreshMessagesArea === 'function') {
-                        refreshMessagesArea();
-                    } else if (typeof refreshMessages === 'function') {
-                        refreshMessages();
-                    } else {
-                        // 简单的页面刷新作为备用
-                        setTimeout(() => {
-                            location.reload();
-                        }, 500);
+                    // 立即将服务器返回的消息追加到列表（与群组逻辑一致，无需刷新）
+                    if (data.message && typeof addNewMessageToChat === 'function') {
+                        addNewMessageToChat(data.message);
+                        setTimeout(scrollToBottom, 100);
                     }
+                    refreshMessagesArea(true);
                 } else {
                     showNotification('发送失败: ' + data.message, 'error');
                 }
@@ -2349,7 +2343,7 @@ $lang = Language::getInstance();
                 
                 // 禁用发送按钮
                 sendButton.disabled = true;
-                sendButton.textContent = '发送中...';
+                sendButton.textContent = chatT('sending');
                 
                 // 如果有语音，发送语音消息；如果有文件，发送文件；否则发送文本消息
                 const roomId = <?php echo $room['id']; ?>;
@@ -2364,7 +2358,7 @@ $lang = Language::getInstance();
                 // 重置按钮状态
                 setTimeout(() => {
                     sendButton.disabled = false;
-                    sendButton.textContent = '发送';
+                    sendButton.textContent = chatT('chat_send_message');
                 }, 1000);
             });
             
@@ -2393,8 +2387,18 @@ $lang = Language::getInstance();
             // 页面加载完成后滚动到底部
             setTimeout(scrollToBottom, 100);
             
-            // 定期检查通话邀请（每2秒）
-            setInterval(checkCallInvitations, 2000);
+            // 立即检查一次通话邀请，然后每 1 秒轮询（保证邀请尽快显示）
+            checkCallInvitations();
+            setInterval(checkCallInvitations, 1000);
+            
+            // 每 1 秒轮询同步消息（含撤回等状态变更）
+            setInterval(function() { refreshMessagesArea(false); }, 1000);
+            
+            // 页面重新可见或侧边栏切换回来时立即同步
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) refreshMessagesArea(false);
+            });
+            window.addEventListener('focus', function() { refreshMessagesArea(false); });
         });
         
         // 添加消息到界面
@@ -2409,10 +2413,10 @@ $lang = Language::getInstance();
             });
             
             // 获取用户头像信息
-            const currentUserAvatar = '<?php echo !empty($user['avatar']) && $user['avatar'] !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $user['avatar']) ? "/CHATTING/public/uploads/avatars/" . $user['avatar'] : ""; ?>';
+            const currentUserAvatar = '<?php echo !empty($user['avatar']) && $user['avatar'] !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $user['avatar']) ? "/Chat_System/public/uploads/avatars/" . $user['avatar'] : ""; ?>';
             const currentUsername = '<?php echo htmlspecialchars($user['username']); ?>';
             const roomDisplayName = '<?php echo htmlspecialchars($room['display_name']); ?>';
-            const roomAvatar = '<?php echo !empty($room['avatar']) && $room['avatar'] !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $room['avatar']) ? "/CHATTING/public/uploads/avatars/" . $room['avatar'] : ""; ?>';
+            const roomAvatar = '<?php echo !empty($room['avatar']) && $room['avatar'] !== 'default_avatar.png' && file_exists(BASE_PATH . '/public/uploads/avatars/' . $room['avatar']) ? "/Chat_System/public/uploads/avatars/" . $room['avatar'] : ""; ?>';
             
             // 生成头像HTML
             let avatarHtml = '';
@@ -2449,59 +2453,31 @@ $lang = Language::getInstance();
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
         
-        // 刷新消息区域（只添加新消息，不清空现有消息）
-        function refreshMessagesArea() {
-            // 如果用户正在输入，跳过刷新
-            const messageInput = document.getElementById('message-input');
-            if (document.activeElement === messageInput) {
-                return;
-            }
-            
-            // 获取当前滚动位置
+        // 刷新消息区域（同步新消息与状态变更）
+        function refreshMessagesArea(forceScroll) {
+            syncRoomMessages(<?php echo $room['id']; ?>, createMessageElement, { forceScroll: !!forceScroll });
+        }
+        
+        // 将一条新消息立即追加到聊天列表（参考群组逻辑，发送后立即可见）
+        function addNewMessageToChat(messageData) {
+            if (!messageData || !messageData.id) return;
             const messagesContainer = document.getElementById('messages-container');
-            const scrollTop = messagesContainer.scrollTop;
-            const scrollHeight = messagesContainer.scrollHeight;
-            const isAtBottom = scrollTop + messagesContainer.clientHeight >= scrollHeight - 10;
-            
-            // 获取当前用户和房间信息
-            const currentUserId = <?php echo $_SESSION['user_id']; ?>;
-            const roomId = <?php echo $room['id']; ?>;
-            
-            // 获取当前已有的消息ID列表
-            const existingMessageIds = new Set();
-            const existingMessages = messagesContainer.querySelectorAll('[data-message-id]');
-            existingMessages.forEach(msg => {
-                const messageId = msg.getAttribute('data-message-id');
-                if (messageId) {
-                    existingMessageIds.add(messageId);
+            if (!messagesContainer) return;
+            // 若 API 返回的是 quoted_sender_name，统一为 quoted_username 供后续扩展使用
+            if (messageData.quoted_sender_name !== undefined && messageData.quoted_username === undefined) {
+                messageData.quoted_username = messageData.quoted_sender_name;
+            }
+            const messageElement = createMessageElement(messageData);
+            if (messageElement) {
+                messageElement.setAttribute('data-msg-sig', getMessageSignature(messageData));
+                messagesContainer.appendChild(messageElement);
+                if (typeof enhanceMediaElements === 'function') {
+                    enhanceMediaElements(messageElement);
                 }
-            });
-            
-            // 发送AJAX请求获取最新消息
-            fetch(`/CHATTING/chat/getRoomMessages?room_id=${roomId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        let hasNewMessages = false;
-                        
-                        // 只添加新消息
-                        data.messages.forEach(message => {
-                            if (!existingMessageIds.has(message.id.toString())) {
-                                const messageElement = createMessageElement(message);
-                                messagesContainer.appendChild(messageElement);
-                                hasNewMessages = true;
-                            }
-                        });
-                        
-                        // 如果有新消息且之前在底部，滚动到底部
-                        if (hasNewMessages && isAtBottom) {
-                            setTimeout(scrollToBottom, 100);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('刷新消息失败:', error);
-                });
+                if (typeof window.addQuoteClickHandlers === 'function') {
+                    window.addQuoteClickHandlers();
+                }
+            }
         }
         
         // 创建消息元素
@@ -2509,11 +2485,13 @@ $lang = Language::getInstance();
             const messageElement = document.createElement('div');
             const isOwn = message.sender_id == <?php echo $_SESSION['user_id']; ?>;
             messageElement.className = `message ${isOwn ? 'own' : ''}`;
+            messageElement.setAttribute('data-message-id', String(message.id));
+            messageElement.setAttribute('data-msg-sig', getMessageSignature(message));
             
             // 生成头像HTML
             let avatarHtml = '';
             if (message.avatar && message.avatar !== 'default_avatar.png') {
-                avatarHtml = `<img src="/CHATTING/public/uploads/avatars/${message.avatar}" alt="${message.username}的头像">`;
+                avatarHtml = `<img src="/Chat_System/public/uploads/avatars/${message.avatar}" alt="${message.username}${chatT('avatar_alt_suffix')}">`;
             } else {
                 avatarHtml = message.username.charAt(0).toUpperCase();
             }
@@ -2532,10 +2510,10 @@ $lang = Language::getInstance();
                 messageContent = `
                     <div class="voice-message">
                         <audio controls class="voice-player">
-                            <source src="/CHATTING/${message.file_path}" type="audio/webm">
-                            您的浏览器不支持音频播放。
+                            <source src="/Chat_System/${message.file_path}" type="audio/webm">
+                            ${chatT('audio_not_supported')}
                         </audio>
-                        <div class="voice-duration">语音消息</div>
+                        <div class="voice-duration">${chatT('voice_message')}</div>
                     </div>
                 `;
             }
@@ -2568,15 +2546,13 @@ $lang = Language::getInstance();
                                     <video controls class="message-video">
                                         <source src="${fileUrl}" type="video/${fileExtension}">
                                     </video>
-                                    <div class="file-name">${message.content}</div>
                                 </div>
                             `;
                         } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
                             // 图片文件
                             messageContent = `
                                 <div class="file-message image-message">
-                                    <img src="${fileUrl}" alt="图片" class="message-image">
-                                    <div class="file-name">${message.content}</div>
+                                    <img src="${fileUrl}" alt="${chatT('message_image_alt')}" class="message-image">
                                 </div>
                             `;
                         } else {
@@ -2587,9 +2563,9 @@ $lang = Language::getInstance();
                                         <div class="file-icon">📄</div>
                                         <div class="file-details">
                                             <div class="file-name">${fileName}</div>
-                                            <div class="file-type">${fileExtension.toUpperCase()} 文件</div>
+                                            <div class="file-type">${chatT('file_type_with_ext', { ext: fileExtension.toUpperCase() })}</div>
                                         </div>
-                                        <a href="${fileUrl}" download class="download-btn">下载</a>
+                                        <a href="${fileUrl}" download class="download-btn">${chatT('download')}</a>
                                     </div>
                                     <div class="file-name">${message.content}</div>
                                 </div>
@@ -2637,7 +2613,7 @@ $lang = Language::getInstance();
                         messageContent = `
                             <div class="file-message multiple-files-message">
                                 ${collageHtml}
-                                <div class="files-info">${fileCount} 个文件</div>
+                                <div class="files-info">${chatT('message_files_count', { count: fileCount })}</div>
                             </div>
                         `;
                     }
@@ -2653,14 +2629,12 @@ $lang = Language::getInstance();
                                 <video controls class="message-video">
                                     <source src="${fileUrl}" type="video/${fileExtension}">
                                 </video>
-                                <div class="file-name">${message.content}</div>
                             </div>
                         `;
                     } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
                         messageContent = `
                             <div class="file-message image-message">
                                 <img src="${fileUrl}" alt="图片" class="message-image">
-                                <div class="file-name">${message.content}</div>
                             </div>
                         `;
                     } else {
@@ -2669,10 +2643,10 @@ $lang = Language::getInstance();
                                 <div class="document-message">
                                     <div class="file-icon">📄</div>
                                     <div class="file-details">
-                                        <div class="file-name">${fileName || '文件'}</div>
-                                        <div class="file-type">${fileExtension.toUpperCase()} 文件</div>
+                                        <div class="file-name">${fileName || chatT('file')}</div>
+                                        <div class="file-type">${chatT('file_type_with_ext', { ext: fileExtension.toUpperCase() })}</div>
                                     </div>
-                                    <a href="${fileUrl}" download class="download-btn">下载</a>
+                                    <a href="${fileUrl}" download class="download-btn">${chatT('download')}</a>
                                 </div>
                                 <div class="file-name">${message.content}</div>
                             </div>
@@ -2685,7 +2659,7 @@ $lang = Language::getInstance();
                 messageContent = `
                     <div class="recalled-message">
                         <span class="recall-icon">↩️</span>
-                        <span class="recall-text">[撤回消息]</span>
+                        <span class="recall-text">${chatT('message_recalled_label')}</span>
                     </div>
                 `;
             }
@@ -2704,18 +2678,23 @@ $lang = Language::getInstance();
                 </div>
             `;
             
+            if (window.currentUserId) {
+                attachMessageBubbleBar(messageElement, message, window.currentUserId);
+            }
+            
             return messageElement;
         }
         
         // 初始化聊天通用功能
         initChatCommon();
+        stampExistingMessageSignatures(<?php echo (int)$room['id']; ?>);
         
         // 检查通话邀请
         function checkCallInvitations() {
             const roomId = <?php echo $roomId; ?>;
             const userId = <?php echo $_SESSION['user_id']; ?>;
             
-            fetch(`/CHATTING/chat/getCallInvitations?roomId=${roomId}&userId=${userId}`)
+            fetch(`/Chat_System/chat/getCallInvitations?roomId=${roomId}&userId=${userId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.invitations && data.invitations.length > 0) {
@@ -2767,7 +2746,7 @@ $lang = Language::getInstance();
         
         // 接受通话邀请
         function acceptCallInvitation(callId) {
-            fetch('/CHATTING/chat/acceptCallInvitation', {
+            fetch('/Chat_System/chat/acceptCallInvitation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -2789,7 +2768,7 @@ $lang = Language::getInstance();
                     const fromUserId = data.callData?.callerId || '';
                     const fromUsername = data.callData?.callerName || '';
                     
-                    const videoCallUrl = `/CHATTING/chat/videoCall?roomId=${roomId}&callType=${callType}&fromUserId=${fromUserId}&fromUsername=${encodeURIComponent(fromUsername)}&isIncoming=true&callId=${callId}`;
+                    const videoCallUrl = `/Chat_System/chat/videoCall?roomId=${roomId}&callType=${callType}&fromUserId=${fromUserId}&fromUsername=${encodeURIComponent(fromUsername)}&isIncoming=true&callId=${callId}`;
                     window.location.href = videoCallUrl;
                 } else {
                     showNotification('接受通话失败: ' + data.message, 'error');
@@ -2803,7 +2782,7 @@ $lang = Language::getInstance();
         
         // 拒绝通话邀请
         function rejectCallInvitation(callId) {
-            fetch('/CHATTING/chat/rejectCallInvitation', {
+            fetch('/Chat_System/chat/rejectCallInvitation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -262,7 +262,7 @@ class ForumController {
                 'success' => true, 
                 'message' => '论坛创建成功',
                 'forum_id' => $forumId,
-                'redirect_url' => '/CHATTING/forum/view?id=' . $forumId
+                'redirect_url' => '/Chat_System/forum/view?id=' . $forumId
             ]);
         } catch (Exception $e) {
             $this->jsonResponse(['success' => false, 'message' => '创建失败: ' . $e->getMessage()]);
@@ -649,7 +649,7 @@ class ForumController {
     
     // 重定向
     private function redirect($path) {
-        header("Location: /CHATTING" . $path);
+        header("Location: /Chat_System" . $path);
         exit;
     }
     
