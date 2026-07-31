@@ -129,6 +129,7 @@ $lang = Language::getInstance();
             
             <div class="auth-links">
                 <p><?php echo __('auth_no_account'); ?> <a href="/Chat_System/auth/register"><?php echo __('auth_register_here'); ?></a></p>
+                <p style="margin-top: 12px;"><a href="/Chat_System/help.php"><?php echo __('nav_help'); ?></a></p>
             </div>
             
             <!-- 语言切换器 -->

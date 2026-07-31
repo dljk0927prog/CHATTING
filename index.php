@@ -62,6 +62,9 @@ if ($isLoggedIn) {
                         <a href="/Chat_System/auth/login" class="btn btn-primary btn-large"><?php echo __('index_login_btn'); ?></a>
                         <a href="/Chat_System/auth/register" class="btn btn-secondary btn-large"><?php echo __('index_register_btn'); ?></a>
                     </div>
+                    <div style="text-align: center; margin-top: 16px;">
+                        <a href="/Chat_System/help.php" class="welcome-help-link"><?php echo __('nav_help'); ?></a>
+                    </div>
                     <div style="text-align: center; margin-top: 24px;">
                         <?php include BASE_PATH . '/app/views/components/languageSwitcher.php'; ?>
                     </div>
@@ -143,6 +146,17 @@ if ($isLoggedIn) {
             padding: 15px 30px;
             font-size: 1.1rem;
             min-width: 150px;
+        }
+
+        .welcome-help-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .welcome-help-link:hover {
+            text-decoration: underline;
         }
 
         @media (max-width: 768px) {

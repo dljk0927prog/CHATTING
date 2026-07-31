@@ -47,6 +47,7 @@ return [
     'nav_settings' => 'Tetapan',
     'nav_logout' => 'Log Keluar',
     'nav_blocked_users' => 'Pengguna Diblok',
+    'nav_help' => 'Manual Pengguna',
     
     // Pengesahan
     'auth_login' => 'Log Masuk',

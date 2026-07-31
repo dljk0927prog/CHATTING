@@ -47,6 +47,7 @@ return [
     'nav_settings' => 'Settings',
     'nav_logout' => 'Logout',
     'nav_blocked_users' => 'Blocked Users',
+    'nav_help' => 'User Manual',
     
     // Video Call
     'video_call' => 'Video Call',

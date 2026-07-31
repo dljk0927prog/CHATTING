@@ -1,0 +1,494 @@
+/* 用户手册 — 电脑端全屏，顶栏 + 目录侧栏固定 */
+
+html,
+body.manual-page {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.manual-page {
+    color: #2c2f36;
+    background:
+        radial-gradient(ellipse at top left, rgba(102, 126, 234, 0.12), transparent 45%),
+        radial-gradient(ellipse at bottom right, rgba(118, 75, 162, 0.1), transparent 40%),
+        #f5f6fa;
+}
+
+.manual-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* —— 顶部固定导航 —— */
+.manual-header {
+    flex: 0 0 auto;
+    z-index: 120;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 12px 20px;
+    box-shadow: 0 4px 18px rgba(102, 126, 234, 0.28);
+}
+
+.manual-header-inner {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.manual-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+
+.manual-brand-text {
+    min-width: 0;
+}
+
+.manual-brand h1 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+}
+
+.manual-subtitle {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.manual-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 8px 14px 8px 12px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.2;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.manual-back:hover {
+    background: rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    color: #fff;
+    text-decoration: none;
+}
+
+.manual-back:active {
+    transform: translateY(0);
+}
+
+.manual-back-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    font-size: 0.85rem;
+}
+
+.manual-header-actions {
+    flex-shrink: 0;
+}
+
+.manual-header-actions .language-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(4px);
+}
+
+.manual-header-actions .language-button:hover {
+    background: rgba(255, 255, 255, 0.32);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* —— 主体：左侧固定目录 + 右侧全屏内容 —— */
+.manual-body {
+    flex: 1 1 auto;
+    display: flex;
+    min-height: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.manual-toc {
+    flex: 0 0 280px;
+    width: 280px;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #fff;
+    border-right: 1px solid #e4e7ef;
+    box-shadow: 4px 0 18px rgba(0, 0, 0, 0.04);
+    padding: 20px 14px 24px;
+    box-sizing: border-box;
+}
+
+.manual-toc h2 {
+    margin: 0 12px 14px;
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+}
+
+.manual-toc ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.manual-toc li {
+    margin: 0 0 4px;
+}
+
+.manual-toc a {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #4a5568;
+    text-decoration: none;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    padding: 10px 12px;
+    border-radius: 10px;
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.manual-toc a:hover {
+    color: #5a67d8;
+    background: #f3f5ff;
+}
+
+.manual-toc a.active {
+    color: #4338ca;
+    background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+    box-shadow: inset 3px 0 0 #667eea;
+    font-weight: 600;
+}
+
+.manual-toc .toc-num {
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #667eea;
+    background: #eef2ff;
+    margin-top: 1px;
+}
+
+.manual-toc a.active .toc-num {
+    color: #fff;
+    background: #667eea;
+}
+
+.manual-toc .toc-label {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.manual-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px 32px 48px;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+.manual-section {
+    background: #fff;
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ebecef;
+    max-width: none;
+}
+
+.manual-section h2 {
+    margin: 0 0 12px;
+    font-size: 1.5rem;
+    color: #333;
+    border-bottom: 2px solid #eef0f5;
+    padding-bottom: 10px;
+}
+
+.manual-intro {
+    color: #555;
+    line-height: 1.65;
+    margin: 0 0 16px;
+}
+
+.manual-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.manual-preview-card {
+    background: linear-gradient(160deg, #f8f9ff 0%, #f3f0fa 100%);
+    border: 1px solid #e4e7f0;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.manual-preview-icon {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+}
+
+.manual-preview-card h3 {
+    margin: 0 0 6px;
+    font-size: 1.02rem;
+    color: #333;
+}
+
+.manual-preview-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+.manual-block {
+    margin-top: 18px;
+}
+
+.manual-block h3 {
+    margin: 0 0 10px;
+    font-size: 1.08rem;
+    color: #444;
+}
+
+.manual-steps,
+.manual-list,
+.manual-tips {
+    margin: 0;
+    padding-left: 22px;
+    color: #444;
+    line-height: 1.65;
+}
+
+.manual-steps li,
+.manual-list li,
+.manual-tips li {
+    margin-bottom: 8px;
+}
+
+.manual-tips {
+    background: #f7f8fc;
+    border-left: 3px solid #667eea;
+    padding: 10px 12px 10px 28px;
+    border-radius: 0 8px 8px 0;
+    list-style: disc;
+}
+
+.manual-table-wrap {
+    overflow-x: auto;
+    margin-top: 8px;
+}
+
+.manual-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+}
+
+.manual-table th,
+.manual-table td {
+    border: 1px solid #e5e7eb;
+    padding: 10px 12px;
+    text-align: center;
+}
+
+.manual-table th {
+    background: #f3f4f8;
+    color: #333;
+    font-weight: 600;
+}
+
+.manual-table td:first-child,
+.manual-table th:first-child {
+    text-align: left;
+}
+
+.manual-faq {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.manual-faq-item {
+    background: #f8f9fc;
+    border: 1px solid #e8eaef;
+    border-radius: 10px;
+    padding: 12px 14px;
+}
+
+.manual-faq-item summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+    list-style: none;
+}
+
+.manual-faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.manual-faq-item summary::before {
+    content: '+ ';
+    color: #667eea;
+    font-weight: 700;
+}
+
+.manual-faq-item[open] summary::before {
+    content: '− ';
+}
+
+.manual-faq-item p {
+    margin: 10px 0 0;
+    color: #555;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* —— 手机端：纵向堆叠，目录可横向滚动 —— */
+@media (max-width: 900px) {
+    html,
+    body.manual-page {
+        height: auto;
+        overflow: auto;
+    }
+
+    .manual-shell {
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    .manual-header {
+        position: sticky;
+        top: 0;
+        padding: 12px 14px;
+    }
+
+    .manual-header-inner {
+        flex-wrap: wrap;
+    }
+
+    .manual-brand {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .manual-brand h1 {
+        font-size: 1.2rem;
+        white-space: normal;
+    }
+
+    .manual-subtitle {
+        white-space: normal;
+    }
+
+    .manual-body {
+        flex-direction: column;
+        overflow: visible;
+    }
+
+    .manual-toc {
+        position: sticky;
+        top: 64px;
+        z-index: 110;
+        flex: none;
+        width: 100%;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        border-right: none;
+        border-bottom: 1px solid #e4e7ef;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        padding: 12px 12px 10px;
+    }
+
+    .manual-toc h2 {
+        margin: 0 4px 8px;
+    }
+
+    .manual-toc ol {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .manual-toc li {
+        margin: 0;
+        flex: 0 0 auto;
+    }
+
+    .manual-toc a {
+        white-space: nowrap;
+        padding: 8px 12px;
+        background: #f7f8fc;
+        border: 1px solid #e8eaef;
+    }
+
+    .manual-toc a.active {
+        box-shadow: none;
+        border-color: #c7d2fe;
+    }
+
+    .manual-toc .toc-num {
+        display: none;
+    }
+
+    .manual-content {
+        height: auto;
+        overflow: visible;
+        padding: 16px 14px 40px;
+    }
+
+    .manual-section {
+        padding: 18px 16px;
+    }
+}

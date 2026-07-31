@@ -47,6 +47,7 @@ return [
     'nav_settings' => '设置',
     'nav_logout' => '退出登录',
     'nav_blocked_users' => '黑名单',
+    'nav_help' => '用户手册',
     
     // 视频通话
     'video_call' => '视频通话',

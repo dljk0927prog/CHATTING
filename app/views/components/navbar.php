@@ -74,6 +74,8 @@ $lang = Language::getInstance();
         background: none;
         width: 100%;
         text-align: left;
+        text-decoration: none;
+        box-sizing: border-box;
     }
     
     .dropdown-item:hover {
@@ -96,6 +98,11 @@ $lang = Language::getInstance();
     .favorites-item:hover {
         color: #9c27b0;
         text-shadow: 0 1px 2px rgba(156, 39, 176, 0.3);
+    }
+
+    .help-item:hover {
+        color: #00897b;
+        text-shadow: 0 1px 2px rgba(0, 137, 123, 0.3);
     }
     
     .block-item:hover {
@@ -1231,6 +1238,10 @@ $lang = Language::getInstance();
                 <?php echo __('nav_settings'); ?>
             </div>
             <div class="dropdown-divider"></div>
+            <a class="dropdown-item help-item" href="/Chat_System/help.php">
+                <?php echo __('nav_help'); ?>
+            </a>
+            <div class="dropdown-divider"></div>
             <div class="dropdown-item block-item" onclick="goToBlockedList()">
                 <?php echo __('nav_blocked_users'); ?>
             </div>
@@ -1854,6 +1865,11 @@ $lang = Language::getInstance();
     // 跳转到收藏页面
     function goToFavorites() {
         window.location.href = '/Chat_System/favorites';
+    }
+
+    // 跳转到用户手册
+    function goToHelp() {
+        window.location.href = '/Chat_System/help.php';
     }
     
     // 跳转到封锁列表页面
@@ -2642,6 +2658,7 @@ $lang = Language::getInstance();
     window.toggleUserMenu = toggleUserMenu;
     window.goToProfile = goToProfile;
     window.goToFavorites = goToFavorites;
+    window.goToHelp = goToHelp;
     window.goToBlockedList = goToBlockedList;
     window.logout = logout;
     window.toggleSidebar = toggleSidebar;

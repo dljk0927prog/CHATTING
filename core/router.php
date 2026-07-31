@@ -110,6 +110,12 @@ if ($path === 'profile/update') {
         $path = $path; // 保持原路径，让下面的通用路由处理
     }
     
+    // 用户手册（跟随界面语言）
+    if ($path === 'help' || $path === 'manual') {
+        header('Location: /Chat_System/help.php');
+        exit;
+    }
+
     // list_forum路由处理
     if ($path === 'list_forum') {
         include VIEW_PATH . '/list_forum.php';
