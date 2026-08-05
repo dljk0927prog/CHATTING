@@ -167,7 +167,7 @@ Camera / live call preview screens are omitted here for privacy. Call behavior i
 
 ## 🎬 Demo Video
 
-Demo video coming soon.
+👉 **[Watch Demo Video](https://drive.google.com/file/d/1ORzazcE8GJH4v3m0YAn4vWjhYbJAFrBT/view?usp=sharing)**
 
 ---
 
@@ -175,7 +175,7 @@ Demo video coming soon.
 
 | Resource | Link |
 |---|---|
-| 🌐 Live URL | [desmondliewjiankai.kolejsynergy.com/Chat_System](https://desmondliewjiankai.kolejsynergy.com/Chat_System/) |
+| 🎬 Demo Video | [Watch](https://drive.google.com/file/d/1ORzazcE8GJH4v3m0YAn4vWjhYbJAFrBT/view?usp=sharing) |
 | 💻 Local (XAMPP) | `http://localhost/Chat_System/` |
 | 📦 GitHub Repository | [dljk0927prog/CHATTING](https://github.com/dljk0927prog/CHATTING) |
 
